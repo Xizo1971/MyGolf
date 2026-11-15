@@ -1,0 +1,18 @@
+{
+  // Worker de MyGolf: sirve la web compilada (public/) y la API (/api/*).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mygolf",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "routes": [
+    { "pattern": "aprende-golf.com", "custom_domain": true },
+    { "pattern": "www.aprende-golf.com", "custom_domain": true }
+  ],
+  "observability": { "enabled": true }
+}

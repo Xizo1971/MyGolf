@@ -37,7 +37,50 @@ Toma como referencia el stack de Naipera (`Xizo1971/Juegos_cartas`), quitando lo
 - **Supabase:** proyecto nuevo; Miguel revisa el coste antes de crearlo.
 - **Diseño:** «Libreta del caddie». Tipografías Barlow Condensed (títulos y números), Barlow (texto) y Caveat (notas a mano); papel `#F1ECDD`, tinta `#1E2B23`, calle `#2E6B3C`, bandera `#D9541E` (texto en `#B8441A`), arena `#E4D3A2`, agua `#3C7FA6`. En la libreta de clases se usan los símbolos de la tarjeta de juego: círculo = salió bien, cuadrado = me costó.
 
-## 4. Pendiente
+## 4. Estructura del repositorio (0.1.0)
+
+```
+build.ts                 Compila static/ + src/main.tsx → public/ (no se sube al repo)
+wrangler.jsonc           Worker «mygolf», Static Assets, dominio aprende-golf.com
+worker/index.ts          Worker: /api/salud; el resto lo sirve Static Assets
+server/dev.ts            Servidor local (http://localhost:8788)
+static/                  index.html, estilo.css, icono.svg, manifest.webmanifest
+src/main.tsx             Arranque y rutas por almohadilla (#/, #/hoyo/N, #/ajustes…)
+src/i18n/t.ts            tx(): textos de la interfaz (español = clave)
+src/curso/               Curso: tipos, programa de 18 hoyos y contenido/es/ (hoyos 1–9)
+src/figuras/             Dibujos SVG del curso (17), con versión para zurdos donde importa
+src/ui/                  Pantallas: Recorrido, HoyoPantalla, Ajustes, Nav
+tests/                   bun test: integridad del curso y de los dibujos
+scripts/capturas.ts      Captura cada dibujo en capturas/ para revisarlo
+```
+
+## 5. El curso
+
+- **Hoyo = lección; golpe = paso; par = número de golpes.** Cada hoyo tiene objetivo, golpes (texto, dibujo, nota del caddie, ejercicio), preguntas de green con explicación y fuentes.
+- Orden «del hoyo hacia fuera»: ida (1–9) = el juego, lo común a todos los golpes y el juego corto; vuelta (10–18) = swing completo y juego en el campo. Programa en `src/curso/programa.ts`; escritos los hoyos 1–9.
+- **Todo hoyo nace con `revisadoPorProfe: false`** y la lección lo avisa. Lo técnico (grip, postura, chip…) es enseñanza estándar, pero debe validarlo el profesor de Miguel antes de darlo por bueno.
+- Datos de reglas comprobados (15/11/2026) contra The R&A, la USGA y prensa especializada; las fuentes van en cada hoyo.
+- La regla del 12 del chip: las fuentes coinciden en PW 1:2, 9 1:3, 7 1:5, pero **no** en los wedges más abiertos; por eso el dibujo solo usa esos tres palos.
+- Dibujos: `FIGURAS` en `src/figuras/index.ts`; `porMano: true` si cambian para zurdos (se reflejan y los textos se recolocan, no se invierten). Cada dibujo lleva `aria-label` descriptivo.
+- El progreso (hoyos terminados) y la mano se guardan en `localStorage` (`mygolf.curso`, `mygolf.mano`) hasta que haya cuentas.
+
+## 6. Desarrollo, pruebas y despliegue
+
+```
+bun install
+bun run dev        # compila y sirve http://localhost:8788
+bun test           # 74 pruebas
+bun run typecheck  # tsc (necesita bun install: incluye @types/react)
+bun run capturas   # PNG de cada dibujo en capturas/
+```
+
+- Cloudflare: conectar el repo al Worker `mygolf` con comando de compilación `bun install && bun run build` y despliegue `npx wrangler deploy`.
+- **Limitaciones de la 0.1.0:**
+  - No hay `bun.lock`: el entorno donde se escribió no podía instalar paquetes. Se genera con el primer `bun install`.
+  - `typecheck` no se ha podido ejecutar todavía, por el mismo motivo.
+  - Las fuentes salen de Google Fonts; para la PWA sin conexión habrá que alojarlas en el propio sitio (licencia OFL).
+
+## 7. Pendiente
 
 - Revisión del diseño por Miguel.
 - Contenido de los 18 hoyos del curso (borrador: 1–9 fundamentos, 10–18 swing y juego).

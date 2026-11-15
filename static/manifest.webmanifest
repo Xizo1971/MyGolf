@@ -1,0 +1,11 @@
+{
+  "name": "MyGolf",
+  "short_name": "MyGolf",
+  "description": "Aprende golf desde cero: curso, libreta de clases y caddie con IA.",
+  "lang": "es",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F1ECDD",
+  "theme_color": "#F1ECDD",
+  "icons": [{ "src": "/icono.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

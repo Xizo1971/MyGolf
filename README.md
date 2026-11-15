@@ -5,4 +5,11 @@ Aplicación personal para aprender golf: curso teórico desde cero, notas de las
 - [Hoja de ruta](docs/hoja-de-ruta.md)
 - [Documentación técnica](docs/documentacion-tecnica.md)
 
-Uso privado (Miguel y Ana). Todavía no hay código: el repositorio contiene las decisiones de partida.
+Uso privado (Miguel y Ana).
+
+**0.1.0:** curso desde cero con 18 hoyos programados y los 9 de la ida escritos, con 17 dibujos propios (versión para zurdos incluida) y preguntas de repaso. Libreta, Caddie y cuentas llegan en la siguiente entrega.
+
+```
+bun install && bun run dev   # http://localhost:8788
+bun test
+```

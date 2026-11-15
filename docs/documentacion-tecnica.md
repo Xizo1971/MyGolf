@@ -29,9 +29,15 @@ Toma como referencia el stack de Naipera (`Xizo1971/Juegos_cartas`), quitando lo
 - [Certeza] La API de Claude admite imágenes, no vídeo: el análisis se hace con fotogramas.
 - **No puedo confirmar** cuánto cuesta al mes un proyecto adicional en Supabase Pro: hay que mirarlo en el panel de facturación antes de crearlo.
 
-## 3. Pendiente de decidir
+## 3. Decisiones (15/11/2026)
 
-- Dirección de diseño.
-- Qué hace la IA en la fase 1.
-- Dónde se guarda la clave de Claude de cada usuario.
-- Dónde está registrado `aprende-golf.com` (para conectarlo al Worker).
+- **Clave de Claude:** cada usuario la guarda en sus ajustes. Se envía una vez al Worker, que la cifra (AES-GCM con una clave maestra que es un secreto del Worker) y guarda solo el texto cifrado en Supabase. El navegador nunca vuelve a recibirla completa (solo los 4 últimos caracteres). Las llamadas a Claude las hace el Worker.
+- **Suscripción de Claude en lugar de API:** no. [Certeza] La documentación de Claude Code («Legal and compliance») dice que Anthropic no permite a desarrolladores de terceros ofrecer el inicio de sesión de Claude.ai en sus aplicaciones ni enviar peticiones con credenciales de los planes Free, Pro, Max o Ultra en nombre de sus usuarios, y que quien construya productos debe usar una clave de API de Claude Console. Se usa una clave de API por usuario.
+- **Dominio:** `aprende-golf.com` está en Cloudflare; se conecta al Worker como dominio propio.
+- **Supabase:** proyecto nuevo; Miguel revisa el coste antes de crearlo.
+- **Diseño:** «Libreta del caddie». Tipografías Barlow Condensed (títulos y números), Barlow (texto) y Caveat (notas a mano); papel `#F1ECDD`, tinta `#1E2B23`, calle `#2E6B3C`, bandera `#D9541E` (texto en `#B8441A`), arena `#E4D3A2`, agua `#3C7FA6`. En la libreta de clases se usan los símbolos de la tarjeta de juego: círculo = salió bien, cuadrado = me costó.
+
+## 4. Pendiente
+
+- Revisión del diseño por Miguel.
+- Contenido de los 18 hoyos del curso (borrador: 1–9 fundamentos, 10–18 swing y juego).

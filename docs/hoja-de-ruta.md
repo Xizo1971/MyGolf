@@ -17,7 +17,9 @@ Etiquetas: **[Decidido]** lo ha decidido Miguel · **[Propuesta]** pendiente de 
 - [Decidido] Cuentas (Supabase Auth), una por persona.
 - [Decidido] Registro de clases: notas propias de cada clase con el profesor (fecha, qué se trabajó, sensaciones, deberes).
 - [Decidido] Curso teórico desde cero.
-- [Propuesta] Qué hace la IA en esta fase (sin vídeo): pendiente de decidir.
+- [Decidido] IA en esta fase («Caddie»): responder preguntas de teoría del curso y preparar un plan de práctica semanal a partir de las notas de clase.
+- [Decidido] Ajustes de usuario: correo, contraseña, clave de Claude y opciones que se irán añadiendo (por ejemplo, diestro o zurdo).
+- [Decidido] Diseño: dirección «Libreta del caddie» (yardage book). Pantallas de muestra en el lienzo de diseño «MyGolf · Libreta del caddie».
 - [Decidido] Sin vídeo en esta fase.
 
 ## Fase 2 · Vídeo y análisis del swing

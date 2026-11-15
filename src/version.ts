@@ -1,3 +1,4 @@
-// Generado por build.ts
-export const VERSION = '0.1.0';
-export const COMPILADO = '2026-11-15T21:43:51.104Z';
+// La versión sale de package.json: así compilar no modifica ningún fichero del repositorio.
+import pkg from '../package.json';
+
+export const VERSION: string = pkg.version;

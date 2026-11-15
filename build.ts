@@ -1,13 +1,9 @@
 // Compila la web: static/ → public/ y src/main.tsx → public/app.js.
 // public/ no se sube al repositorio: lo genera Cloudflare (o `bun run build` en local).
-import { cpSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
+import { cpSync, mkdirSync, rmSync, readFileSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as { version: string };
 const hora = new Date().toISOString();
-writeFileSync(
-  'src/version.ts',
-  `// Generado por build.ts\nexport const VERSION = '${pkg.version}';\nexport const COMPILADO = '${hora}';\n`,
-);
 
 rmSync('public', { recursive: true, force: true });
 mkdirSync('public', { recursive: true });

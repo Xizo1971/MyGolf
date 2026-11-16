@@ -285,7 +285,7 @@ export const P6: Hoyo = {
         'Hombros, brazos y putter forman un **triángulo** que se mueve entero, como un **péndulo**, girando desde el centro del pecho. Las **muñecas no se doblan**.',
         'El movimiento hacia delante es **igual de largo** que hacia atrás. La cabeza se queda quieta hasta que la bola ya ha salido.',
       ],
-      figura: { id: 'putt-3d', pie: 'Toca «▶ Ver el golpe» para ver el péndulo.' },
+      figura: { id: 'putt-frente', pie: 'Con «Girar en 3D» y «▶ Ver el golpe» lo ves moverse como un péndulo.' },
     },
     {
       titulo: 'La puerta',

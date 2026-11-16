@@ -5,8 +5,8 @@ import { Estacas, PlanoHoyo, Tarjeta, ZonaSalida } from './campo';
 import { Bolsa, Loft } from './palos';
 import { GreenCuidados, Seguridad } from './etiqueta';
 import { PosicionBola } from './postura';
-import { Chip3D, Grip3D, ManoArriba3D, Putt3D, PuttPostura3D, TiposGrip3D } from './tres';
-import { PosturaLateral } from './ilustradas';
+import { Chip3D, Grip3D, ManoArriba3D, PuttPostura3D, TiposGrip3D } from './tres';
+import { PosturaLateral, PuttFrente } from './ilustradas';
 import { ViasTren } from './alineacion';
 import { Caida } from './putt';
 import { VueloRodado } from './chip';
@@ -33,7 +33,7 @@ export const FIGURAS = {
   'posicion-bola': { componente: PosicionBola, porMano: true },
   'vias-tren': { componente: ViasTren, porMano: true },
   'putt-postura-3d': { componente: PuttPostura3D, porMano: true },
-  'putt-3d': { componente: Putt3D, porMano: true },
+  'putt-frente': { componente: PuttFrente, porMano: true },
   caida: { componente: Caida, porMano: false },
   'vuelo-rodado': { componente: VueloRodado, porMano: false },
   'chip-3d': { componente: Chip3D, porMano: true },

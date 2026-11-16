@@ -23,11 +23,10 @@ function ConGiro(p: { zurdo?: boolean; ilustracion: ComponentType<PropsFigura>; 
   );
 }
 
-// Lienzo de 560 × 520; la imagen (400 × 520) va desplazada 150 a la derecha
-// para dejar sitio a las notas de la izquierda.
-const W = 560;
-const H = 520;
-const IX = 150;
+// Lienzo en las unidades del recorte (590 × 805); la imagen lo ocupa entero y
+// las notas van en los huecos de papel de los lados.
+const W = 590;
+const H = 805;
 
 function PosturaLateralDibujo({ zurdo }: PropsFigura) {
   const e = espejo(W, zurdo);
@@ -38,20 +37,23 @@ function PosturaLateralDibujo({ zurdo }: PropsFigura) {
       etiqueta={`Maniquí de madera visto desde detrás de la línea, en la postura de partida con un hierro 7: inclinado desde la cadera con la espalda recta, la cadera hacia atrás, rodillas un poco flexionadas y brazos colgando. Una línea vertical baja desde el hombro ${lado} hasta la punta de los pies.`}
     >
       <g transform={e.t}>
-        <image href="/figuras/postura-lateral.webp" x={IX} y={0} width={400} height={520} style={{ mixBlendMode: 'multiply' }} />
+        <image href="/figuras/postura-lateral.webp" x={0} y={0} width={W} height={H} style={{ mixBlendMode: 'multiply' }} />
+        {/* La bola (Gemini no la dibujó): apoyada en el suelo, delante de la cara del palo. */}
+        <circle cx={518} cy={762} r={16} fill="#FFFFFF" stroke={C.tinta} strokeWidth={1.6} />
+        <path d="M509 756 a3 3 0 0 0 0 1 M517 752 a3 3 0 0 0 0 1 M524 760 a3 3 0 0 0 0 1" stroke={C.gris} strokeWidth={2.2} strokeLinecap="round" />
         {/* Hombro → punta del pie */}
-        <path d="M306 104 V500" stroke={C.bandera} strokeWidth={1.8} strokeDasharray="6 5" />
+        <path d="M278 160 V786" stroke={C.bandera} strokeWidth={2} strokeDasharray="7 6" />
         {/* Espalda recta */}
-        <path d="M172 232 L300 56" stroke={C.gris} strokeWidth={1.6} strokeDasharray="6 5" />
+        <path d="M92 353 L279 97" stroke={C.gris} strokeWidth={1.8} strokeDasharray="7 6" />
         {/* Cadera hacia atrás */}
-        <Flecha x1={212} y1={236} x2={168} y2={236} color={C.banderaTexto} />
+        <Flecha x1={128} y1={372} x2={80} y2={372} color={C.banderaTexto} ancho={1.8} />
       </g>
-      <Rotulo x={e.x(14)} y={508} t="Detrás de la línea" ancla={e.a('start')} />
-      <Lapiz x={e.x(232)} y={38} t={['espalda recta,', 'inclinada desde la cadera']} ancla={e.a('end')} />
-      <Lapiz x={e.x(160)} y={268} t={['la cadera', 'hacia atrás']} ancla={e.a('end')} />
-      <Lapiz x={e.x(238)} y={372} t={['rodillas un poco', 'flexionadas']} ancla={e.a('end')} />
-      <Lapiz x={e.x(362)} y={186} t={['brazos', 'colgando']} ancla={e.a('start')} />
-      <Lapiz x={e.x(316)} y={408} t={['hombro sobre', 'la punta', 'del pie']} ancla={e.a('start')} tam={17} />
+      <Rotulo x={e.x(14)} y={795} t="Detrás de la línea" tam={14} ancla={e.a('start')} />
+      <Lapiz x={e.x(238)} y={44} t={['espalda recta,', 'inclinada desde', 'la cadera']} ancla={e.a('end')} tam={24} />
+      <Lapiz x={e.x(112)} y={412} t={['la cadera', 'hacia atrás']} ancla={e.a('end')} tam={22} />
+      <Lapiz x={e.x(176)} y={572} t={['rodillas', 'un poco', 'flexionadas']} ancla={e.a('end')} tam={24} />
+      <Lapiz x={e.x(345)} y={300} t={['brazos', 'colgando']} ancla={e.a('start')} tam={24} />
+      <Lapiz x={e.x(290)} y={588} t={['hombro sobre', 'la punta', 'del pie']} ancla={e.a('start')} tam={21} />
     </Lienzo>
   );
 }

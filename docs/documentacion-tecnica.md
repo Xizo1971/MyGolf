@@ -84,7 +84,14 @@ bun run capturas   # PNG de cada dibujo en capturas/
   - `bun.lock` y `typecheck` se comprobaron el 15/11/2026 en el Mac de Miguel (sin errores).
   - Las fuentes salen de Google Fonts; para la PWA sin conexión habrá que alojarlas en el propio sitio (licencia OFL).
 
-## 7. Pendiente
+## 7. Sello de versión
+
+- Cada compilación lleva un **sello**: versión de `package.json`, commit (7 caracteres) y fecha. En Cloudflare el commit sale de `WORKERS_CI_COMMIT_SHA`; en local, de git (con `+local` si hay cambios sin subir).
+- Se ve en **tres sitios**: al pie de todas las pantallas («MyGolf v0.1.1 · a1b2c3d · 16/11/2026 10:20», hora de Madrid), en `/version.json` y en `/api/salud`.
+- Si el sello de la app abierta no coincide con `/version.json` (navegador o app instalada con una copia vieja), la app muestra «Hay una versión más nueva… Toca para recargar».
+- **Norma:** subir la versión de `package.json` en cada entrega (0.1.1 = sello de versión; 0.2.0 = cuentas, libreta y caddie).
+
+## 8. Pendiente
 
 - Revisión del diseño por Miguel.
 - Contenido de los 18 hoyos del curso (borrador: 1–9 fundamentos, 10–18 swing y juego).

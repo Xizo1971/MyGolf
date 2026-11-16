@@ -7,7 +7,11 @@ Bun.serve({
   port: PUERTO,
   async fetch(req) {
     const url = new URL(req.url);
-    if (url.pathname === '/api/salud') return Response.json({ ok: true, version: VERSION, local: true });
+    if (url.pathname === '/api/salud') {
+      const f = Bun.file('public/version.json');
+      const sello = (await f.exists()) ? await f.json() : { version: VERSION };
+      return Response.json({ ok: true, ...sello, local: true });
+    }
     const ruta = url.pathname === '/' ? '/index.html' : url.pathname;
     const f = Bun.file(`public${ruta}`);
     if (await f.exists()) return new Response(f);

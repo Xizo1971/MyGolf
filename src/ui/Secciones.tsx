@@ -2,6 +2,7 @@
 import { tx } from '../i18n/t';
 import { Nav, type Pestana } from './Nav';
 import { useMano, type Mano } from './preferencias';
+import { Sello } from './Sello';
 
 export function Ajustes() {
   const [mano, ponerMano] = useMano();
@@ -27,6 +28,7 @@ export function Ajustes() {
           <span className="rotulo">{tx('Cuenta y clave de Claude')}</span>
           <p>{tx('Llegan en la siguiente entrega, con las cuentas de Miguel y Ana.')}</p>
         </div>
+        <Sello />
       </main>
       <Nav actual="ajustes" />
     </div>
@@ -42,6 +44,7 @@ export function EnObras({ pestana, titulo, texto }: { pestana: Pestana; titulo: 
       </header>
       <main className="contenido">
         <p className="lapiz grande">{texto}</p>
+        <Sello />
       </main>
       <Nav actual={pestana} />
     </div>

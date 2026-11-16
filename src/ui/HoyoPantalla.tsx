@@ -6,6 +6,7 @@ import type { Pregunta } from '../curso/tipos';
 import { FIGURAS } from '../figuras';
 import { Texto } from './Texto';
 import { useHoyosHechos, useMano } from './preferencias';
+import { Sello } from './Sello';
 
 /** Plano pequeño del hoyo con un punto por golpe. */
 function PlanoGolpes({ total, actual }: { total: number; actual: number }) {
@@ -71,7 +72,7 @@ export function HoyoPantalla({ numero }: { numero: number }) {
   if (!h) {
     return (
       <div className="pantalla">
-        <main className="contenido"><p>{tx('Este hoyo aún no está escrito.')}</p><a className="boton" href="#/">{tx('Volver al recorrido')}</a></main>
+        <main className="contenido"><p>{tx('Este hoyo aún no está escrito.')}</p><a className="boton" href="#/">{tx('Volver al recorrido')}</a><Sello /></main>
       </div>
     );
   }
@@ -162,6 +163,7 @@ export function HoyoPantalla({ numero }: { numero: number }) {
             </div>
           </section>
         )}
+        <Sello />
       </main>
 
       {!terminado && !enPreguntas && (

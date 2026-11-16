@@ -3,6 +3,7 @@ import { tx } from '../i18n/t';
 import { HOYOS, PROGRAMA, hoyo, par } from '../curso';
 import { Nav } from './Nav';
 import { useHoyosHechos } from './preferencias';
+import { Sello } from './Sello';
 
 // Posición de cada hoyo en el mapa (de la salida, abajo, al green final, arriba).
 const PUNTOS: [number, number][] = [
@@ -127,6 +128,7 @@ export function Recorrido() {
             );
           })}
         </ol>
+        <Sello />
       </main>
       <Nav actual="recorrido" />
     </div>

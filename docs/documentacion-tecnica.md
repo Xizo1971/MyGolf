@@ -74,10 +74,14 @@ bun run typecheck  # tsc (necesita bun install: incluye @types/react)
 bun run capturas   # PNG de cada dibujo en capturas/
 ```
 
-- Cloudflare: conectar el repo al Worker `mygolf` con comando de compilación `bun install && bun run build` y despliegue `npx wrangler deploy`.
+- **Despliegue automático (funcionando desde el 16/11/2026):** cada push a `main` compila y publica en aprende-golf.com.
+  - Worker `mygolf` → Settings → Builds: repo `Xizo1971/MyGolf`, rama `main`, compilación `bun install && bun run build`, despliegue `npx wrangler deploy`, carpeta `/`.
+  - Variables de compilación: `BUN_VERSION=1.4.4` y `SKIP_DEPENDENCY_INSTALL=true`.
+  - La app de Cloudflare en GitHub necesita acceso al repo MyGolf (github.com/settings/installations); sin él, el panel avisa de «This project is disconnected from your Git account».
+  - Token de compilación: se reutiliza el de Naipera (`juegos-cartas build token`).
+  - Para publicar a mano en caso de emergencia: `bun run build && npx wrangler deploy`.
 - **Limitaciones de la 0.1.0:**
-  - No hay `bun.lock`: el entorno donde se escribió no podía instalar paquetes. Se genera con el primer `bun install`.
-  - `typecheck` no se ha podido ejecutar todavía, por el mismo motivo.
+  - `bun.lock` y `typecheck` se comprobaron el 15/11/2026 en el Mac de Miguel (sin errores).
   - Las fuentes salen de Google Fonts; para la PWA sin conexión habrá que alojarlas en el propio sitio (licencia OFL).
 
 ## 7. Pendiente

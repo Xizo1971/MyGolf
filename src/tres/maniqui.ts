@@ -123,12 +123,13 @@ export function escenaPostura(): Escena {
     ],
     etiquetasHastaPitch: 60,
     etiquetas: [
-      { p: [0.95, 0, j.bola[2]], texto: ['objetivo'], dx: 4, dy: 14, color: GRIS },
       { p: j.medio, texto: ['espalda recta,', 'inclinada', 'desde la cadera'], dx: -34, dy: -40, ancla: 'end' },
       { p: j.caderaD, texto: ['la cadera', 'hacia atrás'], dx: -18, dy: 0, ancla: 'end', color: '#1E2B23' },
       { p: j.rodillaD, texto: ['rodillas un poco', 'flexionadas'], dx: -18, dy: 4, ancla: 'end', color: '#1E2B23' },
       { p: j.codoI, texto: ['brazos', 'colgando'], dx: 16, dy: 0, color: '#1E2B23' },
       { p: [j.hombroI[0], 0.02, j.hombroI[2]], texto: ['hombros sobre la', 'punta de los pies'], dx: 10, dy: 22 },
+      // la última: si pisa a otra, se mueve ella
+      { p: [0.95, 0, j.bola[2]], texto: ['objetivo'], dx: 4, dy: -10, color: GRIS },
     ],
   };
 }

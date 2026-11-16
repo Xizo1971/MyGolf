@@ -1,8 +1,8 @@
 // Visor de escenas 3D: dibuja en SVG, se gira arrastrando con el dedo (horizontal) o
 // el ratón (horizontal y vertical) y tiene botones de vistas predefinidas.
-import { useId, useMemo, useRef, useState, type PointerEvent as PE } from 'react';
+import { useId, useMemo, useRef, useState, type PointerEvent as PE, type ReactNode } from 'react';
 import { C, F } from '../figuras/comun';
-import { envolvente, espejar, mezclar, proyector, siluetas, trocear, type Camara, type Escena, type Linea3D, type Proyector } from './motor';
+import { envolvente, espejar, mezclar, proyector, siluetas, trocear, type Camara, type Escena, type Etiqueta3D, type Linea3D, type Proyector, type V3 } from './motor';
 
 export interface Vista extends Camara {
   nombre: string;
@@ -17,6 +17,10 @@ export interface PropsVisor {
   alto?: number;
   /** Mostrar las guías y etiquetas (se pueden ocultar para ver el cuerpo limpio). */
   guiasIniciales?: boolean;
+  /** Encuadre fijo (para escenas animadas: si no, la cámara bailaría con cada fotograma). */
+  encuadre?: { c: V3; r: number };
+  /** Botones propios (por ejemplo, «▶ Ver el golpe»), junto a los de las vistas. */
+  botones?: ReactNode;
 }
 
 const ANCHO = 350;
@@ -35,13 +39,44 @@ function trazo(l: Linea3D, pr: Proyector, k: number) {
   );
 }
 
+/**
+ * Coloca las notas: las recoloca para que no se salgan del dibujo (ancho aproximado de la
+ * letra a mano) y, si una pisa a otra ya colocada, la sube (o, si no cabe, la baja).
+ */
+export function colocarNotas(etiquetas: Etiqueta3D[], pr: Proyector, alto: number) {
+  const puestas: { x: number; y: number; t: Etiqueta3D; caja: [number, number, number, number] }[] = [];
+  const pisa = (c: [number, number, number, number]) =>
+    puestas.some(({ caja: o }) => c[0] < o[2] && c[2] > o[0] && c[1] < o[3] && c[3] > o[1]);
+  for (const t of etiquetas) {
+    const s = pr.p(t.p);
+    const anchoTexto = Math.max(...t.texto.map((l) => l.length)) * 7.6;
+    const altoTexto = t.texto.length * 17;
+    const ancla = t.ancla ?? 'start';
+    const izq = ancla === 'start' ? 0 : ancla === 'end' ? anchoTexto : anchoTexto / 2;
+    let x = s.x + (t.dx ?? 0);
+    x = Math.min(Math.max(x, 6 + izq), ANCHO - 6 - (anchoTexto - izq));
+    const yMin = 18, yMax = alto - 22 - (t.texto.length - 1) * 17;
+    const y0 = Math.min(Math.max(s.y + (t.dy ?? 0), yMin), yMax);
+    const caja = (y: number): [number, number, number, number] => [x - izq, y - 14, x - izq + anchoTexto, y - 14 + altoTexto];
+    let y = y0;
+    for (let i = 1; i <= 12 && pisa(caja(y)); i++) {
+      const arriba = y0 - i * 9, abajo = y0 + i * 9;
+      if (arriba >= yMin && !pisa(caja(arriba))) { y = arriba; break; }
+      if (abajo <= yMax && !pisa(caja(abajo))) { y = abajo; break; }
+    }
+    puestas.push({ x, y, t, caja: caja(y) });
+  }
+  return puestas;
+}
+
 export function Visor3D(p: PropsVisor) {
   const alto = p.alto ?? 380;
   const escena = useMemo(() => {
     const e = p.zurdo ? espejar(p.escena) : p.escena;
     return { ...e, prims: trocear(e.prims, 0.3) };
   }, [p.escena, p.zurdo]);
-  const caja = useMemo(() => envolvente(escena.prims), [escena]);
+  const cajaEscena = useMemo(() => envolvente(escena.prims), [escena]);
+  const caja = p.encuadre ? { c: (p.zurdo ? [-p.encuadre.c[0], p.encuadre.c[1], p.encuadre.c[2]] : p.encuadre.c) as V3, r: p.encuadre.r } : cajaEscena;
   // Para zurdos, las vistas laterales se miran desde el otro lado.
   const vistas = useMemo(() => p.vistas.map((v) => (p.zurdo ? { ...v, yaw: -v.yaw } : v)), [p.vistas, p.zurdo]);
   const [cam, setCam] = useState<Camara>(() => ({ yaw: vistas[0]!.yaw, pitch: vistas[0]!.pitch }));
@@ -104,24 +139,14 @@ export function Visor3D(p: PropsVisor) {
           </g>
         ))}
         {guias && escena.guias?.map((l, k) => trazo(l, pr, k))}
-        {guias && cam.pitch <= (escena.etiquetasHastaPitch ?? 90) && escena.etiquetas?.map((t, k) => {
-          const s = pr.p(t.p);
-          // Recoloca el texto para que no se salga del dibujo (ancho aproximado de la letra a mano).
-          const anchoTexto = Math.max(...t.texto.map((l) => l.length)) * 7.6;
-          const ancla = t.ancla ?? 'start';
-          const izq = ancla === 'start' ? 0 : ancla === 'end' ? anchoTexto : anchoTexto / 2;
-          let x = s.x + (t.dx ?? 0);
-          x = Math.min(Math.max(x, 6 + izq), ANCHO - 6 - (anchoTexto - izq));
-          const y = Math.min(Math.max(s.y + (t.dy ?? 0), 18), alto - 22 - (t.texto.length - 1) * 17);
-          return (
-            <text
-              key={k} x={x} y={y} fontFamily={F.lapiz} fontSize={18} fill={t.color ?? C.banderaTexto}
-              textAnchor={t.ancla ?? 'start'} stroke={C.papelClaro} strokeWidth={4} paintOrder="stroke" strokeLinejoin="round"
-            >
-              {t.texto.map((l, i) => <tspan key={i} x={x} dy={i === 0 ? 0 : 17}>{l}</tspan>)}
-            </text>
-          );
-        })}
+        {guias && cam.pitch <= (escena.etiquetasHastaPitch ?? 90) && colocarNotas(escena.etiquetas ?? [], pr, alto).map((n, k) => (
+          <text
+            key={k} x={n.x} y={n.y} fontFamily={F.lapiz} fontSize={18} fill={n.t.color ?? C.banderaTexto}
+            textAnchor={n.t.ancla ?? 'start'} stroke={C.papelClaro} strokeWidth={4} paintOrder="stroke" strokeLinejoin="round"
+          >
+            {n.t.texto.map((l, i) => <tspan key={i} x={n.x} dy={i === 0 ? 0 : 17}>{l}</tspan>)}
+          </text>
+        ))}
         <text x={ANCHO - 8} y={alto - 8} textAnchor="end" fontFamily={F.rotulo} fontSize={11} letterSpacing={1} fill={C.gris}>
           ↔ ARRASTRA PARA GIRAR
         </text>
@@ -133,6 +158,7 @@ export function Visor3D(p: PropsVisor) {
             onClick={() => { setCam({ yaw: vv.yaw, pitch: vv.pitch }); setVistaActiva(i); }}
           >{vv.nombre}</button>
         ))}
+        {p.botones}
         {(escena.guias?.length || escena.etiquetas?.length) ? (
           <button type="button" className="guias" aria-pressed={guias} onClick={() => setGuias(!guias)}>{guias ? 'Ocultar notas' : 'Ver notas'}</button>
         ) : null}

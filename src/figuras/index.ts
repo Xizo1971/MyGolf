@@ -5,11 +5,11 @@ import { Estacas, PlanoHoyo, Tarjeta, ZonaSalida } from './campo';
 import { Bolsa, Loft } from './palos';
 import { GreenCuidados, Seguridad } from './etiqueta';
 import { PosicionBola } from './postura';
-import { Grip3D, ManoArriba3D, TiposGrip3D } from './tres';
+import { Chip3D, Grip3D, ManoArriba3D, Putt3D, PuttPostura3D, TiposGrip3D } from './tres';
 import { PosturaLateral } from './ilustradas';
 import { ViasTren } from './alineacion';
-import { Caida, Pendulo } from './putt';
-import { ChipPostura, VueloRodado } from './chip';
+import { Caida } from './putt';
+import { VueloRodado } from './chip';
 
 export interface FichaFigura {
   componente: ComponentType<PropsFigura>;
@@ -32,10 +32,11 @@ export const FIGURAS = {
   'postura-lateral': { componente: PosturaLateral, porMano: true },
   'posicion-bola': { componente: PosicionBola, porMano: true },
   'vias-tren': { componente: ViasTren, porMano: true },
-  pendulo: { componente: Pendulo, porMano: true },
+  'putt-postura-3d': { componente: PuttPostura3D, porMano: true },
+  'putt-3d': { componente: Putt3D, porMano: true },
   caida: { componente: Caida, porMano: false },
   'vuelo-rodado': { componente: VueloRodado, porMano: false },
-  'chip-postura': { componente: ChipPostura, porMano: true },
+  'chip-3d': { componente: Chip3D, porMano: true },
 } satisfies Record<string, FichaFigura>;
 
 export type FiguraId = keyof typeof FIGURAS;

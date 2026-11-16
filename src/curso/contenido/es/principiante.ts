@@ -277,6 +277,7 @@ export const P6: Hoyo = {
         'En el green la bola **rueda**, no vuela. El golpe se llama **putt** y se da con el **putter**.',
         'El grip del putt es más tranquilo que el del swing: las **palmas se miran** una a otra a los lados del puño. Inclínate desde la cadera hasta que los **ojos queden encima de la bola** o muy cerca.',
       ],
+      figura: { id: 'putt-postura-3d', pie: 'Desde detrás de la línea se ve que los ojos quedan encima de la bola.' },
     },
     {
       titulo: 'El péndulo',
@@ -284,7 +285,7 @@ export const P6: Hoyo = {
         'Hombros, brazos y putter forman un **triángulo** que se mueve entero, como un **péndulo**, girando desde el centro del pecho. Las **muñecas no se doblan**.',
         'El movimiento hacia delante es **igual de largo** que hacia atrás. La cabeza se queda quieta hasta que la bola ya ha salido.',
       ],
-      figura: { id: 'pendulo' },
+      figura: { id: 'putt-3d', pie: 'Toca «▶ Ver el golpe» para ver el péndulo.' },
     },
     {
       titulo: 'La puerta',
@@ -383,7 +384,7 @@ export const P8: Hoyo = {
         'Pon **más peso en el pie adelantado** y deja las **manos por delante de la bola**: el palo se inclina hacia el objetivo.',
         'El movimiento se parece al del putt: lo hacen los **hombros**, con las muñecas firmes. Y el peso se queda delante todo el golpe.',
       ],
-      figura: { id: 'chip-postura' },
+      figura: { id: 'chip-3d', pie: 'Toca «▶ Ver el golpe»: lo mueven los hombros y las muñecas no se doblan.' },
       caddie: 'No intentes levantar la bola con las manos. Ya la levanta el palo.',
     },
     {

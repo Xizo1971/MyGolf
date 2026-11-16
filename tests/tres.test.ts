@@ -60,3 +60,11 @@ describe('maniquí y manos', () => {
     expect(e.etiquetas?.some((t) => t.texto.join(' ').includes('izquierdo'))).toBe(true);
   });
 });
+
+describe('espejo de las notas', () => {
+  test('una nota sin ancla (empieza en el punto) pasa a terminar en él', () => {
+    const e = espejar({ prims: [], etiquetas: [{ p: [0.2, 0, 0], texto: ['x'], dx: 10 }] });
+    expect(e.etiquetas![0]!.ancla).toBe('end');
+    expect(e.etiquetas![0]!.dx).toBe(-10);
+  });
+});

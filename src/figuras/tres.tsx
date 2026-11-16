@@ -1,7 +1,9 @@
 // Figuras 3D del curso: el maniquí en postura y las manos en el grip, que se pueden girar.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Visor3D, type Vista } from '../tres/Visor3D';
 import { escenaPostura } from '../tres/maniqui';
+import { GIRO_CHIP, GIRO_PUTT, escenaChip, escenaPutt } from '../tres/golpes';
+import { envolvente, type Escena } from '../tres/motor';
 import { escenaGrip, type TipoUnion } from '../tres/manos';
 import type { PropsFigura } from './comun';
 
@@ -73,5 +75,76 @@ export function TiposGrip3D({ zurdo }: PropsFigura) {
       />
       <p className="nota-union">{actual.nota}</p>
     </div>
+  );
+}
+
+// --- Juego corto: putt y chip, con el golpe animado -------------------------------
+
+const VISTAS_FRENTE: Vista[] = [
+  { nombre: 'De frente', yaw: 0, pitch: 6 },
+  { nombre: 'Detrás de la línea', yaw: 90, pitch: 6 },
+  { nombre: 'En diagonal', yaw: 45, pitch: 18 },
+];
+const VISTAS_DETRAS: Vista[] = [VISTAS_FRENTE[1]!, VISTAS_FRENTE[0]!, VISTAS_FRENTE[2]!];
+
+/**
+ * Golpe animado: «▶ Ver el golpe» mueve el triángulo de hombros, brazos y palo como un
+ * péndulo (giro = amplitud · seno). El encuadre es el de la postura quieta.
+ */
+function useGolpe(escenaDe: (giro: number) => Escena, amplitud: number, periodoMs: number) {
+  const quieta = useMemo(() => escenaDe(0), [escenaDe]);
+  const encuadre = useMemo(() => {
+    const e = envolvente(quieta.prims);
+    return { c: e.c, r: e.r * 1.04 };
+  }, [quieta]);
+  const [giro, setGiro] = useState(0);
+  const [jugando, setJugando] = useState(false);
+  useEffect(() => {
+    if (!jugando) { setGiro(0); return; }
+    let id = 0;
+    const t0 = performance.now();
+    const paso = (t: number) => {
+      setGiro(amplitud * Math.sin(((t - t0) / periodoMs) * 2 * Math.PI));
+      id = requestAnimationFrame(paso);
+    };
+    id = requestAnimationFrame(paso);
+    return () => cancelAnimationFrame(id);
+  }, [jugando, amplitud, periodoMs]);
+  const escena = useMemo(() => (giro === 0 ? quieta : escenaDe(giro)), [giro, quieta, escenaDe]);
+  const boton = (
+    <button type="button" className={jugando ? 'on' : undefined} aria-pressed={jugando} onClick={() => setJugando(!jugando)}>
+      {jugando ? '■ Parar' : '▶ Ver el golpe'}
+    </button>
+  );
+  return { escena, encuadre, boton };
+}
+
+export function Putt3D({ zurdo }: PropsFigura) {
+  const g = useGolpe(escenaPutt, GIRO_PUTT, 1800);
+  return (
+    <Visor3D
+      escena={g.escena} encuadre={g.encuadre} botones={g.boton} vistas={VISTAS_FRENTE} zurdo={zurdo} alto={400}
+      etiqueta="Maniquí haciendo un putt, visto de frente: hombros, brazos y putter forman un triángulo que gira entero desde el centro del pecho, con las muñecas quietas; el putter va tanto hacia atrás como hacia delante. Los ojos quedan encima de la bola. Se puede girar y animar."
+    />
+  );
+}
+
+export function PuttPostura3D({ zurdo }: PropsFigura) {
+  const g = useGolpe(escenaPutt, GIRO_PUTT, 1800);
+  return (
+    <Visor3D
+      escena={g.escena} encuadre={g.encuadre} botones={g.boton} vistas={VISTAS_DETRAS} zurdo={zurdo} alto={400}
+      etiqueta="Maniquí en la postura del putt visto desde detrás de la línea: inclinado desde la cadera, brazos colgando y los ojos encima de la bola. Se puede girar y animar."
+    />
+  );
+}
+
+export function Chip3D({ zurdo }: PropsFigura) {
+  const g = useGolpe(escenaChip, GIRO_CHIP, 2200);
+  return (
+    <Visor3D
+      escena={g.escena} encuadre={g.encuadre} botones={g.boton} vistas={VISTAS_FRENTE} zurdo={zurdo} alto={400}
+      etiqueta={`Maniquí en la postura del chip visto de frente: pies juntos, la bola algo retrasada, más peso en el pie ${zurdo ? 'derecho' : 'izquierdo'} y las manos por delante de la bola, con el palo inclinado hacia el objetivo. Se puede girar y animar.`}
+    />
   );
 }

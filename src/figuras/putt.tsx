@@ -1,49 +1,5 @@
-// Dibujos del hoyo 8: el péndulo del putt y la caída del green.
-import { Bandera, Bola, C, Flecha, Lapiz, Lienzo, Rotulo, espejo, type PropsFigura } from './comun';
-
-function Triangulo(p: { giro: number; fantasma?: boolean }) {
-  return (
-    <g transform={`rotate(${p.giro} 175 74)`} opacity={p.fantasma ? 0.28 : 1}>
-      <path d="M128 76 L222 76" stroke="#7C9A84" strokeWidth={16} strokeLinecap="round" />
-      <path d="M132 80 L172 168 M218 80 L178 168" stroke="#D9BFA6" strokeWidth={10} strokeLinecap="round" />
-      <path d="M128 76 L175 172 L222 76" fill="none" stroke={C.bandera} strokeWidth={p.fantasma ? 0 : 1.5} strokeDasharray="4 3" />
-      <rect x={165} y={160} width={20} height={20} rx={6} fill={C.manoA} stroke={C.tinta} />
-      <path d="M175 178 V238" stroke="#8C9488" strokeWidth={3} />
-      <rect x={160} y={236} width={30} height={9} rx={2} fill="#9BA39E" stroke={C.tinta} />
-    </g>
-  );
-}
-
-/** De frente: hombros, brazos y putter forman un triángulo que se balancea entero. */
-export function Pendulo({ zurdo }: PropsFigura) {
-  const W = 350, H = 300;
-  const e = espejo(W, zurdo);
-  const r = 168;
-  const arco = (g: number) => {
-    const a = (g * Math.PI) / 180;
-    return { x: 175 - Math.sin(a) * r, y: 74 + Math.cos(a) * r };
-  };
-  const a1 = arco(16), a2 = arco(-16);
-  return (
-    <Lienzo w={W} h={H} etiqueta="Putt visto de frente: hombros, brazos y putter forman un triángulo que se mueve entero como un péndulo, con las muñecas quietas y la misma distancia atrás que adelante">
-      <g transform={e.t}>
-        <path d={`M${a1.x} ${a1.y} A${r} ${r} 0 0 0 ${a2.x} ${a2.y}`} fill="none" stroke={C.gris} strokeWidth={1.2} strokeDasharray="3 4" />
-        <Triangulo giro={16} fantasma />
-        <Triangulo giro={-16} fantasma />
-        <Triangulo giro={0} />
-        <circle cx={175} cy={48} r={17} fill={C.piel} stroke={C.tinta} strokeWidth={1.2} />
-        <circle cx={175} cy={74} r={4} fill={C.bandera} />
-        <Bola x={197} y={240} r={5} />
-        <Flecha x1={250} y1={276} x2={330} y2={276} color={C.tinta} />
-      </g>
-      <Rotulo x={e.x(336)} y={292} t="hacia el hoyo" ancla={e.a('end')} />
-      <Lapiz x={e.x(240)} y={46} t={['gira desde', 'el centro', 'del pecho']} ancla={e.a('start')} tam={17} />
-      <Lapiz x={e.x(234)} y={150} t={['el triángulo', 'no se deforma:', 'muñecas quietas']} ancla={e.a('start')} tam={17} color={C.tinta} />
-      <Lapiz x={e.x(14)} y={150} t={['tanto atrás', 'como adelante']} ancla={e.a('start')} tam={17} color={C.tinta} />
-      <Rotulo x={e.x(14)} y={20} t="Visto de frente" ancla={e.a('start')} />
-    </Lienzo>
-  );
-}
+// Dibujo del putt: la caída del green (el péndulo está en 3D: tres.tsx).
+import { Bandera, Bola, C, Flecha, Lapiz, Lienzo, Rotulo } from './comun';
 
 /** Desde arriba: en un green inclinado se apunta por el lado alto y la bola cae hacia el hoyo. */
 export function Caida() {

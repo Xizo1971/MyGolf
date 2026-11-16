@@ -65,7 +65,11 @@ export function espejar(e: Escena): Escena {
     prims: e.prims.map((p) => (p.tipo === 'esfera' ? { ...p, c: m(p.c) } : { ...p, a: m(p.a), b: m(p.b) })),
     fondo: e.fondo?.map((l) => ({ ...l, a: m(l.a), b: m(l.b) })),
     guias: e.guias?.map((l) => ({ ...l, a: m(l.a), b: m(l.b) })),
-    etiquetas: e.etiquetas?.map((t) => ({ ...t, p: m(t.p), dx: t.dx === undefined ? undefined : -t.dx, ancla: t.ancla === 'start' ? 'end' : t.ancla === 'end' ? 'start' : t.ancla })),
+    // Sin ancla explícita, el texto empieza en el punto ('start'): reflejado, termina en él.
+    etiquetas: e.etiquetas?.map((t) => {
+      const a = t.ancla ?? 'start';
+      return { ...t, p: m(t.p), dx: t.dx === undefined ? undefined : -t.dx, ancla: a === 'start' ? 'end' : a === 'end' ? 'start' : a };
+    }),
   };
 }
 

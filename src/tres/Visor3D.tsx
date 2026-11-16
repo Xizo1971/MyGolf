@@ -1,8 +1,8 @@
 // Visor de escenas 3D: dibuja en SVG, se gira arrastrando con el dedo (horizontal) o
 // el ratón (horizontal y vertical) y tiene botones de vistas predefinidas.
-import { useMemo, useRef, useState, type PointerEvent as PE } from 'react';
+import { useId, useMemo, useRef, useState, type PointerEvent as PE } from 'react';
 import { C, F } from '../figuras/comun';
-import { envolvente, espejar, proyector, siluetas, trocear, type Camara, type Escena, type Linea3D, type Proyector } from './motor';
+import { envolvente, espejar, mezclar, proyector, siluetas, trocear, type Camara, type Escena, type Linea3D, type Proyector } from './motor';
 
 export interface Vista extends Camara {
   nombre: string;
@@ -51,7 +51,13 @@ export function Visor3D(p: PropsVisor) {
 
   const pr = proyector(cam, caja.c, caja.r, ANCHO, alto);
   const formas = siluetas(escena.prims, pr, C.papelClaro);
-  const tinta = C.tinta;
+  const tinta = escena.contorno?.color ?? C.tinta;
+  const anchoTinta = escena.contorno?.ancho ?? 2.2;
+  // Acuarela: un degradado por color (claro arriba a la izquierda, sombra abajo a la derecha);
+  // con objectBoundingBox cada pieza recibe su propio degradado.
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const colores = escena.acuarela ? [...new Set(formas.map((f) => f.base))] : [];
+  const idColor = (c: string) => `acu${uid}${c.slice(1)}`;
 
   const empezar = (e: PE<SVGSVGElement>) => {
     arrastre.current = { x: e.clientX, y: e.clientY, cam };
@@ -74,11 +80,27 @@ export function Visor3D(p: PropsVisor) {
         style={{ display: 'block', background: C.papelClaro, border: `1px solid ${C.borde}`, touchAction: 'pan-y', cursor: 'grab', userSelect: 'none' }}
         onPointerDown={empezar} onPointerMove={mover} onPointerUp={soltar} onPointerCancel={soltar}
       >
+        {colores.length > 0 && (
+          <defs>
+            {colores.map((c) => (
+              <linearGradient key={c} id={idColor(c)} x1="0.1" y1="0" x2="0.9" y2="1">
+                <stop offset="0" stopColor={mezclar(c, '#FFFFFF', 0.45)} />
+                <stop offset="0.5" stopColor={c} />
+                <stop offset="1" stopColor={mezclar(c, '#7A5530', 0.18)} />
+              </linearGradient>
+            ))}
+          </defs>
+        )}
         {escena.fondo?.map((l, k) => trazo(l, pr, k))}
         {formas.map((f, i) => (
           <g key={i}>
-            <path d={f.d} fill={tinta} stroke={tinta} strokeWidth={2.2} strokeLinejoin="round" />
-            <path d={f.d} fill={f.color} />
+            <path d={f.d} fill={tinta} stroke={tinta} strokeWidth={anchoTinta} strokeLinejoin="round" />
+            {escena.acuarela ? (
+              <>
+                <path d={f.d} fill={`url(#${idColor(f.base)})`} />
+                {f.niebla > 0.01 && <path d={f.d} fill={C.papelClaro} fillOpacity={f.niebla} />}
+              </>
+            ) : <path d={f.d} fill={f.color} />}
           </g>
         ))}
         {guias && escena.guias?.map((l, k) => trazo(l, pr, k))}

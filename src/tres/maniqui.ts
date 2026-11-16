@@ -2,12 +2,10 @@
 // Medidas en metros, para una persona de 1,75 m aprox. Ejes: ver motor.ts.
 import { v, type Escena, type Linea3D, type Primitiva, type V3 } from './motor';
 
-const MADERA = '#D8B98F';
-const ARTIC = '#C49D6B';
-const CABEZA = '#DEC49E';
-const MANO_A = '#CFE0B9';
-const MANO_B = '#F2D3C2';
-const PUNO = '#3E4A44';
+// Colores del maniquí de las ilustraciones (madera clara, articulaciones algo más oscuras).
+const MADERA = '#DDBE92';
+const ARTIC = '#CDA877';
+const PUNO = '#3A3A38';
 const VARILLA = '#9BA39E';
 const HIERRO = '#B9BFBA';
 const BANDERA = '#D9541E';
@@ -29,7 +27,8 @@ export function posturaHierro(): Articulaciones {
   const eje: V3 = [0, Math.cos(inclinacion), Math.sin(inclinacion)];
   const cuello = v.sum(pelvis, v.mul(eje, 0.5));
   const medio = v.sum(pelvis, v.mul(eje, 0.25));
-  const miraBola: V3 = [0, Math.cos(1.0), Math.sin(1.0)];
+  // La cabeza sigue la línea de la espalda (algo más inclinada, mirando a la bola).
+  const miraBola: V3 = [0, Math.cos(0.74), Math.sin(0.74)];
   const cabeza = v.sum(cuello, v.mul(miraBola, 0.16));
   const hombroI: V3 = [0.18, cuello[1] - 0.02, cuello[2] - 0.02];
   const hombroD: V3 = [-0.17, cuello[1] - 0.06, cuello[2] - 0.01];
@@ -55,30 +54,41 @@ export function posturaHierro(): Articulaciones {
   };
 }
 
-const cap = (a: V3, b: V3, r: number, color: string): Primitiva => ({ tipo: 'capsula', a, b, r, color });
+const cap = (a: V3, b: V3, r: number, color: string, grupo?: string): Primitiva => ({ tipo: 'capsula', a, b, r, color, grupo });
 const esf = (c: V3, r: number, color: string): Primitiva => ({ tipo: 'esfera', c, r, color });
 
-/** El cuerpo, el palo y la bola como primitivas. */
+/** El cuerpo, el palo y la bola como primitivas: maniquí de dibujo, como en las ilustraciones. */
 export function cuerpo(j: Articulaciones): Primitiva[] {
+  const eje = v.norm(v.res(j.cuello, j.pelvis));
+  const enEje = (t: number) => v.sum(j.pelvis, v.mul(eje, t));
+  const dirCabeza = v.norm(v.res(j.cabeza, j.cuello));
+  const enCabeza = (t: number) => v.sum(j.cuello, v.mul(dirCabeza, t));
+  const munecaI = v.entre(j.codoI, j.manoI, 0.82), munecaD = v.entre(j.codoD, j.manoD, 0.82);
   return [
-    // pies y piernas
-    cap(j.talonI, j.puntaI, 0.042, MADERA), cap(j.talonD, j.puntaD, 0.042, MADERA),
-    cap(j.tobilloI, j.rodillaI, 0.052, MADERA), cap(j.tobilloD, j.rodillaD, 0.052, MADERA),
-    esf(j.rodillaI, 0.058, ARTIC), esf(j.rodillaD, 0.058, ARTIC),
-    cap(j.rodillaI, j.caderaI, 0.072, MADERA), cap(j.rodillaD, j.caderaD, 0.072, MADERA),
-    // tronco
-    cap(j.caderaI, j.caderaD, 0.1, MADERA),
-    cap(j.pelvis, j.medio, 0.112, MADERA),
-    cap(j.medio, v.entre(j.medio, j.cuello, 0.75), 0.13, MADERA),
-    cap(j.hombroI, j.hombroD, 0.062, MADERA),
-    cap(j.cuello, v.entre(j.cuello, j.cabeza, 0.5), 0.045, ARTIC),
-    esf(j.cabeza, 0.102, CABEZA),
-    // brazos (izquierdo = mano de arriba en verde, derecho = mano de abajo en rosa, como en el curso)
-    esf(j.hombroI, 0.055, ARTIC), esf(j.hombroD, 0.055, ARTIC),
-    cap(j.hombroI, j.codoI, 0.044, MADERA), cap(j.hombroD, j.codoD, 0.044, MADERA),
-    esf(j.codoI, 0.042, ARTIC), esf(j.codoD, 0.042, ARTIC),
-    cap(j.codoI, j.manoI, 0.038, MADERA), cap(j.codoD, j.manoD, 0.038, MADERA),
-    esf(j.manoI, 0.047, MANO_A), esf(j.manoD, 0.047, MANO_B),
+    // pies (planos y en punta) y tobillos
+    cap(j.talonI, j.puntaI, 0.034, MADERA), cap(j.talonD, j.puntaD, 0.034, MADERA),
+    esf(j.tobilloI, 0.032, ARTIC), esf(j.tobilloD, 0.032, ARTIC),
+    // piernas: espinilla, rodilla de bola, muslo
+    // (cada pieza larga en su grupo: el visor la trocea y así se pinta como una sola)
+    cap(j.tobilloI, j.rodillaI, 0.046, MADERA, 'espinillaI'), cap(j.tobilloD, j.rodillaD, 0.046, MADERA, 'espinillaD'),
+    esf(j.rodillaI, 0.052, ARTIC), esf(j.rodillaD, 0.052, ARTIC),
+    cap(j.rodillaI, j.caderaI, 0.064, MADERA, 'musloI'), cap(j.rodillaD, j.caderaD, 0.064, MADERA, 'musloD'),
+    esf(j.caderaI, 0.068, ARTIC), esf(j.caderaD, 0.068, ARTIC),
+    // tronco en tres bloques: pelvis ancha, cintura estrecha y pecho
+    cap(v.sum(j.caderaI, v.mul(eje, 0.05)), v.sum(j.caderaD, v.mul(eje, 0.05)), 0.105, MADERA),
+    cap(enEje(0.15), enEje(0.21), 0.082, ARTIC),
+    cap(enEje(0.28), enEje(0.39), 0.125, MADERA),
+    cap(j.hombroI, j.hombroD, 0.07, MADERA),
+    // cuello y cabeza en forma de huevo, en la línea de la espalda
+    cap(enCabeza(0.0), enCabeza(0.08), 0.034, ARTIC),
+    cap(enCabeza(0.13), enCabeza(0.2), 0.078, MADERA),
+    // brazos: hombro, codo y muñeca de bola; manos de madera
+    esf(j.hombroI, 0.052, ARTIC), esf(j.hombroD, 0.052, ARTIC),
+    cap(j.hombroI, j.codoI, 0.04, MADERA), cap(j.hombroD, j.codoD, 0.04, MADERA),
+    esf(j.codoI, 0.037, ARTIC), esf(j.codoD, 0.037, ARTIC),
+    cap(j.codoI, munecaI, 0.034, MADERA), cap(j.codoD, munecaD, 0.034, MADERA),
+    esf(munecaI, 0.027, ARTIC), esf(munecaD, 0.027, ARTIC),
+    cap(munecaI, j.manoI, 0.04, MADERA), cap(munecaD, j.manoD, 0.04, MADERA),
     // palo y bola
     cap(j.puno, v.entre(j.puno, j.talonPalo, 0.28), 0.014, PUNO),
     cap(v.entre(j.puno, j.talonPalo, 0.28), j.talonPalo, 0.0065, VARILLA),
@@ -103,6 +113,8 @@ export function escenaPostura(): Escena {
   return {
     prims: cuerpo(j),
     fondo: suelo(j),
+    acuarela: true,
+    contorno: { color: '#3D3631', ancho: 1.7 },
     guias: [
       // hombros sobre la punta de los pies
       { a: j.hombroI, b: [j.hombroI[0], 0, j.hombroI[2]], color: BANDERA, discontinua: true },
@@ -112,7 +124,7 @@ export function escenaPostura(): Escena {
     etiquetasHastaPitch: 60,
     etiquetas: [
       { p: [0.95, 0, j.bola[2]], texto: ['objetivo'], dx: 4, dy: 14, color: GRIS },
-      { p: v.sum(j.cuello, v.mul(ejeEspalda, 0.1)), texto: ['espalda recta,', 'inclinada desde la cadera'], dx: -10, dy: -14, ancla: 'end' },
+      { p: j.medio, texto: ['espalda recta,', 'inclinada', 'desde la cadera'], dx: -34, dy: -40, ancla: 'end' },
       { p: j.caderaD, texto: ['la cadera', 'hacia atrás'], dx: -18, dy: 0, ancla: 'end', color: '#1E2B23' },
       { p: j.rodillaD, texto: ['rodillas un poco', 'flexionadas'], dx: -18, dy: 4, ancla: 'end', color: '#1E2B23' },
       { p: j.codoI, texto: ['brazos', 'colgando'], dx: 16, dy: 0, color: '#1E2B23' },

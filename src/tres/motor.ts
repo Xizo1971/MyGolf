@@ -44,6 +44,10 @@ export interface Escena {
   etiquetas?: Etiqueta3D[];
   /** Por encima de esta inclinación de cámara no se muestran las notas (se amontonan). */
   etiquetasHastaPitch?: number;
+  /** Acabado «acuarela»: cada pieza con su degradado de luz a sombra (como las ilustraciones). */
+  acuarela?: boolean;
+  /** Color y grosor del contorno (por defecto, tinta de 2,2). */
+  contorno?: { color: string; ancho: number };
 }
 
 export interface Camara {
@@ -57,6 +61,7 @@ export interface Camara {
 export function espejar(e: Escena): Escena {
   const m = (p: V3): V3 => [-p[0], p[1], p[2]];
   return {
+    ...e,
     prims: e.prims.map((p) => (p.tipo === 'esfera' ? { ...p, c: m(p.c) } : { ...p, a: m(p.a), b: m(p.b) })),
     fondo: e.fondo?.map((l) => ({ ...l, a: m(l.a), b: m(l.b) })),
     guias: e.guias?.map((l) => ({ ...l, a: m(l.a), b: m(l.b) })),
@@ -129,6 +134,9 @@ export interface Forma {
   d: string;
   color: string;
   prof: number;
+  /** Color sin aclarar y cuánto se aclara hacia el papel por la distancia (0–0,28). */
+  base: string;
+  niebla: number;
 }
 
 const f1 = (n: number) => Math.round(n * 10) / 10;
@@ -185,7 +193,8 @@ export function siluetas(prims: Primitiva[], pr: Proyector, fondo: string): Form
   const rango = dMax - dMin || 1;
   for (const t of sueltas) {
     // Lo lejano se aclara un poco hacia el papel: ayuda a leer la profundidad.
-    formas.push({ d: t.d, color: mezclar(t.color, fondo, ((t.prof - dMin) / rango) * 0.28), prof: t.prof });
+    const niebla = ((t.prof - dMin) / rango) * 0.28;
+    formas.push({ d: t.d, color: mezclar(t.color, fondo, niebla), prof: t.prof, base: t.color, niebla });
   }
   return formas.sort((a, b) => b.prof - a.prof);
 }

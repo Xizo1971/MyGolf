@@ -5,7 +5,7 @@ import { Estacas, PlanoHoyo, Tarjeta, ZonaSalida } from './campo';
 import { Bolsa, Loft } from './palos';
 import { GreenCuidados, Seguridad } from './etiqueta';
 import { PosicionBola } from './postura';
-import { Chip3D, Grip3D, Impacto3D, ManoArriba3D, MedioSwing3D, PuttPostura3D, SwingCompleto3D, TiposGrip3D } from './tres';
+import { Bunker3D, Chip3D, Driver3D, Grip3D, Impacto3D, ManoArriba3D, MedioSwing3D, PuttPostura3D, SwingCompleto3D, TiposGrip3D } from './tres';
 import { PosturaLateral, PuttFrente } from './ilustradas';
 import { ViasTren } from './alineacion';
 import { Caida } from './putt';
@@ -40,6 +40,8 @@ export const FIGURAS = {
   'medio-swing-3d': { componente: MedioSwing3D, porMano: true },
   'swing-3d': { componente: SwingCompleto3D, porMano: true },
   'impacto-3d': { componente: Impacto3D, porMano: true },
+  'driver-3d': { componente: Driver3D, porMano: true },
+  'bunker-3d': { componente: Bunker3D, porMano: true },
 } satisfies Record<string, FichaFigura>;
 
 export type FiguraId = keyof typeof FIGURAS;

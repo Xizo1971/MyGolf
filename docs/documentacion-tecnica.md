@@ -108,7 +108,7 @@ bun run capturas   # PNG de cada dibujo en capturas/
 ## 8. Pendiente
 
 - Opinión de Miguel sobre las figuras 3D antes de extenderlas (chip y putt aún tienen el cuerpo en 2D).
-- Figuras 3D del driver (hoyo 13) y del búnker (hoyo 14); después, intermedio y avanzado.
+- (Hecho en 0.2.8: `driver-3d`, hoyo 13, con tee y cabeza grande; `bunker-3d`, hoyo 14, con la arena y la marca de entrada a 5 cm.) Siguiente: el swing animado del driver y del búnker; después, intermedio y avanzado.
 - Limitación del swing 3D: los codos no se doblan (en el final los brazos quedan algo estirados).
 - Revisión de todo el contenido técnico por el profesor.
 - Cuentas, Libreta y Caddie (fase 1).

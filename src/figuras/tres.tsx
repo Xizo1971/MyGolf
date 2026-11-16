@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Visor3D, type Vista } from '../tres/Visor3D';
 import { escenaPostura } from '../tres/maniqui';
-import { GIRO_CHIP, GIRO_PUTT, encuadreSwing, escenaChip, escenaPutt, escenaSwing, momentos, type TipoSwing } from '../tres/golpes';
+import { GIRO_CHIP, GIRO_PUTT, encuadreSwing, escenaBunker, escenaChip, escenaDriver, escenaPutt, escenaSwing, momentos, type TipoSwing } from '../tres/golpes';
 import { envolvente, type Escena } from '../tres/motor';
 import { escenaGrip, type TipoUnion } from '../tres/manos';
 import type { PropsFigura } from './comun';
@@ -206,4 +206,24 @@ export function SwingCompleto3D({ zurdo }: PropsFigura) {
 export function Impacto3D({ zurdo }: PropsFigura) {
   return <Swing3D zurdo={zurdo} tipo="impacto" inicial={2}
     etiqueta="Maniquí en el momento del impacto con un hierro: las manos van por delante de la cabeza del palo, el peso está en el pie adelantado y el punto más bajo del swing (la chuleta) queda después de la bola. Se puede girar, parar en cada momento y animar." />;
+}
+
+export function Driver3D({ zurdo }: PropsFigura) {
+  const escena = useMemo(() => escenaDriver(), []);
+  return (
+    <Visor3D
+      escena={escena} vistas={VISTAS_FRENTE} zurdo={zurdo} alto={420}
+      etiqueta={`Maniquí preparado para salir con el driver, visto de frente: pies más separados que los hombros, la bola sobre el tee frente al talón ${zurdo ? 'derecho' : 'izquierdo'}, con la mitad de la bola asomando por encima del palo, y el hombro de atrás algo más bajo. Se puede girar.`}
+    />
+  );
+}
+
+export function Bunker3D({ zurdo }: PropsFigura) {
+  const escena = useMemo(() => escenaBunker(), []);
+  return (
+    <Visor3D
+      escena={escena} vistas={VISTAS_FRENTE} zurdo={zurdo} alto={420}
+      etiqueta="Maniquí preparado en el búnker, visto de frente: pies algo abiertos y clavados en la arena, más peso en el pie adelantado, la cara del palo abierta y una marca unos 5 centímetros detrás de la bola, donde el palo entra en la arena para pasar por debajo de ella. Se puede girar."
+    />
+  );
 }

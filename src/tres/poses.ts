@@ -4,7 +4,7 @@
 import { v, type V3 } from './motor';
 import type { Articulaciones } from './maniqui';
 
-export type TipoPalo = 'hierro' | 'putter';
+export type TipoPalo = 'hierro' | 'putter' | 'driver';
 
 export interface ParamsPose {
   /** Media separación de los tobillos (m). */
@@ -52,9 +52,12 @@ export function construirPose(p: ParamsPose): Articulaciones {
   const hombroD = v.sum(cuello, [-0.18, -0.02 - baja, -0.02]);
 
   // La cabeza del palo: la bola queda delante de la cara, en el centro.
-  const putter = p.palo === 'putter';
-  const talonPalo: V3 = [p.bola[0] - (putter ? 0.035 : 0.045), putter ? 0.022 : 0.03, p.bola[2] - 0.05];
-  const puntaPalo = v.sum(talonPalo, putter ? [0, 0, 0.1] : [0, -0.005, 0.09]);
+  const putter = p.palo === 'putter', driver = p.palo === 'driver';
+  // El driver: cabeza grande apoyada en el suelo detrás de la bola, que está sobre el tee.
+  const talonPalo: V3 = driver
+    ? [p.bola[0] - 0.068, 0.045, p.bola[2] - 0.06]
+    : [p.bola[0] - (putter ? 0.035 : 0.045), putter ? 0.022 : 0.03, p.bola[2] - 0.05];
+  const puntaPalo = v.sum(talonPalo, putter ? [0, 0, 0.1] : driver ? [0, 0, 0.1] : [0, -0.005, 0.09]);
   const dir = v.norm(v.res(talonPalo, p.manos));
   const manoI = v.sum(p.manos, v.mul(dir, -0.025));
   const manoD = v.sum(p.manos, v.mul(dir, 0.025));
@@ -74,6 +77,7 @@ export function construirPose(p: ParamsPose): Articulaciones {
     codoI: v.sum(v.entre(hombroI, manoI, 0.52), [fuera, 0, 0.02]),
     codoD: v.sum(v.entre(hombroD, manoD, 0.5), [-fuera, 0, 0.02]),
     manoI, manoD, puno, talonPalo, puntaPalo, bola: p.bola,
+    ...(driver ? { radioCabeza: 0.045, tee: true } : {}),
   };
 }
 
@@ -241,3 +245,37 @@ export function faseEn(marcas: [number, FaseSwing][], t: number): FaseSwing {
   }
   return marcas[marcas.length - 1]![1];
 }
+
+/**
+ * Postura con el driver: pies más separados que los hombros, bola frente al talón
+ * adelantado y sobre el tee (la mitad asoma por encima del palo), hombro de atrás más bajo.
+ */
+export const POSE_DRIVER: ParamsPose = {
+  pies: 0.25,
+  pelvis: [-0.02, 0.89, -0.1],
+  inclinacion: 33,
+  ladeo: -7,
+  cabezaExtra: 10,
+  rodilla: { y: 0.47, z: 0.07 },
+  hombroBajo: 0.08,
+  codosFuera: 0.01,
+  manos: [0.02, 0.75, 0.36],
+  bola: [0.21, 0.09, 0.6],
+  palo: 'driver',
+};
+
+/** Postura en el búnker: pies abiertos y clavados en la arena, peso adelante, bola algo adelantada. */
+export const POSE_BUNKER: ParamsPose = {
+  pies: 0.19,
+  abrir: 0.08,
+  pelvis: [0.03, 0.85, -0.1],
+  inclinacion: 32,
+  ladeo: 3,
+  cabezaExtra: 10,
+  rodilla: { y: 0.45, z: 0.08 },
+  hombroBajo: 0.04,
+  codosFuera: 0.02,
+  manos: [0.04, 0.68, 0.29],
+  bola: [0.05, 0.0213, 0.46],
+  palo: 'hierro',
+};

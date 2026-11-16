@@ -751,6 +751,7 @@ export const P13: Hoyo = {
         'La altura del tee importa. Una referencia muy repetida: con el driver apoyado detrás de la bola, **la mitad de la bola debe asomar por encima** de la parte de arriba del palo.',
         'Con un tee muy bajo es fácil pegar con la parte baja de la cara; con uno muy alto, por debajo de la bola, y sale hacia arriba sin avanzar.',
       ],
+      figura: { id: 'driver-3d', pie: 'Gíralo: de frente se ve dónde va la bola; desde detrás de la línea, la altura del tee.' },
     },
     {
       titulo: 'Pies y bola',
@@ -813,6 +814,7 @@ export const P14: Hoyo = {
         'El palo entra en la arena **unos 5 centímetros detrás de la bola**, pasa por debajo y sale por delante. La bola sale encima de un puñado de arena.',
         'Si entras mucho más atrás, la arena frena el palo y la bola no sale. Si le das a la bola directamente, sale disparada por encima del green.',
       ],
+      figura: { id: 'bunker-3d', pie: 'La raya roja marca dónde entra el palo: unos 5 cm detrás de la bola.' },
     },
     {
       titulo: 'Cara abierta',

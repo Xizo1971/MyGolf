@@ -1,7 +1,7 @@
 // Escenas 3D: el putt, el chip y el swing (completo, medio swing e impacto), con su animación.
 import { envolvente, v, type Escena, type Etiqueta3D, type Linea3D, type V3 } from './motor';
 import { cuerpo, posturaHierro, suelo } from './maniqui';
-import { POSE_CHIP, POSE_PUTT, QUIETO, centroPecho, construirPose, faseEn, girarTriangulo, poseSwing, rotar, type FaseSwing } from './poses';
+import { POSE_BUNKER, POSE_CHIP, POSE_DRIVER, POSE_PUTT, QUIETO, centroPecho, construirPose, faseEn, girarTriangulo, poseSwing, rotar, type FaseSwing } from './poses';
 
 const BANDERA = '#D9541E';
 const GRIS = '#5B6458';
@@ -160,4 +160,63 @@ export function encuadreSwing(tipo: TipoSwing) {
   const prims = momentos(tipo).flatMap((m) => escenaSwing(tipo, m.t).prims);
   const e = envolvente(prims);
   return { c: e.c, r: e.r * 1.02 };
+}
+
+/** Postura con el driver y la bola en el tee (hoyo 13). */
+export function escenaDriver(): Escena {
+  const j = construirPose(POSE_DRIVER);
+  const talonPie: V3 = [j.tobilloI[0] - 0.03, 0.002, j.talonI[2]];
+  return {
+    prims: cuerpo(j),
+    fondo: suelo(j),
+    acuarela: true,
+    contorno: CONTORNO,
+    guias: [
+      // la bola, frente a la parte de dentro del talón adelantado
+      { a: talonPie, b: [talonPie[0], 0.002, j.bola[2]], color: BANDERA, discontinua: true },
+      // separación de los pies
+      { a: [j.tobilloD[0], 0.002, -0.12], b: [j.tobilloI[0], 0.002, -0.12], color: GRIS, ancho: 1.2 },
+    ],
+    etiquetasHastaPitch: 60,
+    etiquetas: [
+      { p: j.bola, texto: ['la mitad de la bola', 'asoma por encima'], dx: 14, dy: -26 },
+      { p: [talonPie[0], 0, (talonPie[2] + j.bola[2]) / 2], texto: ['frente al talón', 'adelantado'], dx: 14, dy: 24 },
+      { p: [0, 0, -0.12], texto: ['pies más separados', 'que los hombros'], dx: -10, dy: 30, ancla: 'end', color: TINTA },
+      { p: j.hombroD, texto: ['hombro de atrás', 'algo más bajo'], dx: -16, dy: -10, ancla: 'end', color: TINTA },
+    ],
+  };
+}
+
+/** Postura en el búnker, con la arena y el punto donde entra el palo (hoyo 14). */
+export function escenaBunker(): Escena {
+  const j = construirPose(POSE_BUNKER);
+  const arena: Linea3D[] = [];
+  // La arena: rayas muy juntas dentro de una elipse alrededor de los pies y la bola.
+  const cx = 0.05, cz = 0.18, rx = 0.62, rz = 0.55;
+  for (let z = cz - rz; z <= cz + rz; z += 0.035) {
+    const k = 1 - ((z - cz) / rz) ** 2;
+    if (k <= 0) continue;
+    const ancho = rx * Math.sqrt(k);
+    arena.push({ a: [cx - ancho, 0, z], b: [cx + ancho, 0, z], color: '#E7D6A6', ancho: 7 });
+  }
+  const entra = j.bola[0] - 0.05;
+  return {
+    prims: cuerpo(j),
+    fondo: [...arena, ...suelo(j).filter((l) => l.flecha)],
+    acuarela: true,
+    contorno: CONTORNO,
+    guias: [
+      // por donde entra el palo: unos 5 cm detrás de la bola
+      { a: [entra, 0.003, j.bola[2] - 0.07], b: [entra, 0.003, j.bola[2] + 0.07], color: BANDERA, ancho: 3 },
+      // y sale por delante: el palo pasa por debajo de la bola
+      { a: [entra, 0.004, j.bola[2]], b: [j.bola[0] + 0.07, 0.004, j.bola[2]], color: BANDERA, ancho: 1.4, discontinua: true, flecha: true },
+    ],
+    etiquetasHastaPitch: 60,
+    etiquetas: [
+      { p: [entra, 0, j.bola[2]], texto: ['el palo entra aquí,', 'unos 5 cm detrás'], dx: -14, dy: 30, ancla: 'end' },
+      { p: v.entre(j.talonPalo, j.puntaPalo, 0.5), texto: ['cara abierta'], dx: 16, dy: -16, color: TINTA },
+      { p: v.sum(j.tobilloI, [0.06, 0.2, 0]), texto: ['más peso en', 'el pie adelantado'], dx: 14, dy: 0, color: TINTA },
+      { p: j.tobilloD, texto: ['pies clavados', 'en la arena'], dx: -16, dy: 4, ancla: 'end', color: TINTA },
+    ],
+  };
 }

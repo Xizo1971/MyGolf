@@ -18,6 +18,9 @@ export interface Articulaciones {
   hombroI: V3; hombroD: V3; codoI: V3; codoD: V3; manoI: V3; manoD: V3;
   /** Extremo superior del palo, talón y punta de la cabeza del palo. */
   puno: V3; talonPalo: V3; puntaPalo: V3; bola: V3;
+  /** Grosor de la cabeza del palo (por defecto, la de un hierro) y si la bola está sobre un tee. */
+  radioCabeza?: number;
+  tee?: boolean;
 }
 
 /** Postura de partida con un hierro 7: inclinación de la espalda ≈ 37° desde la vertical. */
@@ -92,7 +95,8 @@ export function cuerpo(j: Articulaciones): Primitiva[] {
     // palo y bola
     cap(j.puno, v.entre(j.puno, j.talonPalo, 0.28), 0.014, PUNO),
     cap(v.entre(j.puno, j.talonPalo, 0.28), j.talonPalo, 0.0065, VARILLA),
-    cap(j.talonPalo, j.puntaPalo, 0.024, HIERRO),
+    cap(j.talonPalo, j.puntaPalo, j.radioCabeza ?? 0.024, HIERRO),
+    ...(j.tee ? [cap([j.bola[0], 0, j.bola[2]], [j.bola[0], j.bola[1] - 0.02, j.bola[2]], 0.006, '#E9DDC2')] : []),
     esf(j.bola, 0.0213, '#FFFFFF'),
   ];
 }

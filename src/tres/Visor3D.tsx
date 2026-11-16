@@ -117,6 +117,16 @@ export function Visor3D(p: PropsVisor) {
       >
         {colores.length > 0 && (
           <defs>
+            {/* Acabado de ilustración: el trazo tiembla un poco (como a mano) y el relleno
+                lleva manchas suaves de acuarela. La semilla es fija: no parpadea al girar. */}
+            <filter id={`ilus${uid}`} x="-3%" y="-3%" width="106%" height="106%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="4" result="ruido" />
+              <feDisplacementMap in="SourceGraphic" in2="ruido" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="temblor" />
+              <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="9" result="manchas" />
+              <feColorMatrix in="manchas" type="matrix" values="0 0 0 0 0.86  0 0 0 0 0.74  0 0 0 0 0.6  0 0 0 0.9 -0.32" result="tinte" />
+              <feComposite in="tinte" in2="temblor" operator="in" result="tinteDentro" />
+              <feBlend in="tinteDentro" in2="temblor" mode="multiply" />
+            </filter>
             {colores.map((c) => (
               <linearGradient key={c} id={idColor(c)} x1="0.1" y1="0" x2="0.9" y2="1">
                 <stop offset="0" stopColor={mezclar(c, '#FFFFFF', 0.45)} />
@@ -127,6 +137,7 @@ export function Visor3D(p: PropsVisor) {
           </defs>
         )}
         {escena.fondo?.map((l, k) => trazo(l, pr, k))}
+        <g filter={escena.acuarela ? `url(#ilus${uid})` : undefined}>
         {formas.map((f, i) => (
           <g key={i}>
             <path d={f.d} fill={tinta} stroke={tinta} strokeWidth={anchoTinta} strokeLinejoin="round" />
@@ -138,6 +149,7 @@ export function Visor3D(p: PropsVisor) {
             ) : <path d={f.d} fill={f.color} />}
           </g>
         ))}
+        </g>
         {guias && escena.guias?.map((l, k) => trazo(l, pr, k))}
         {guias && cam.pitch <= (escena.etiquetasHastaPitch ?? 90) && colocarNotas(escena.etiquetas ?? [], pr, alto).map((n, k) => (
           <text

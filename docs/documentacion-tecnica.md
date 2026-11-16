@@ -60,7 +60,7 @@ scripts/vistas3d.tsx     Captura las vistas de las figuras 3D
 
 - **Hoyo = lección; golpe = paso; par = número de golpes.** Cada hoyo tiene objetivo, golpes (texto, dibujo, nota del caddie, ejercicio), preguntas de green con explicación y fuentes.
 - **Tres niveles (0.2.0, a petición de Miguel):** en las clases se tarda meses en salir al campo, así que el curso empieza por la técnica.
-  - **Principiante · Campo de prácticas (15 hoyos):** todo lo necesario antes de salir al campo. Grip, postura, alineación, putt, chip, pitch, swing, impacto; los palos, el driver, el búnker y las nociones del campo van al final. Escritos: 1–8, 12 y 15. Pendientes: 9 (pitch), 10 (swing completo), 11 (impacto), 13 (driver) y 14 (búnker).
+  - **Principiante · Campo de prácticas (15 hoyos):** todo lo necesario antes de salir al campo. Grip, postura, alineación, putt, chip, pitch, swing, impacto; los palos, el driver, el búnker y las nociones del campo van al final. Escritos los 15 (0.2.6). Los hoyos 9–11, 13 y 14 aún no tienen figuras propias del swing.
   - **Intermedio · En el campo (9):** reglas que se usan jugando, rutina, estrategia, cuestas, rough, viento, primera vuelta, hándicap. Sin escribir.
   - **Avanzado · Afinar (9):** efectos, altura, distancias con wedges, greens difíciles, presión, juego mental, práctica con objetivo, estadísticas. Sin escribir.
   - Identificador de hoyo `<nivel>-<n>`; rutas `#/nivel/<nivel>` y `#/hoyo/<nivel>/<n>`. Programa en `src/curso/programa.ts`.
@@ -69,6 +69,7 @@ scripts/vistas3d.tsx     Captura las vistas de las figuras 3D
 - **Ilustraciones de Gemini (0.2.1):** maniquí de madera a tinta y acuarela, sin texto y con fondo crema liso; las notas las pinta la app encima (`src/figuras/ilustradas.tsx`) y el botón «↻ Girar en 3D» cambia a la figura 3D. Original en `arte/originales/`; `python3 arte/procesar.py original salida.webp x0 y0 x1 y1` recorta y equilibra el blanco (el papel queda blanco) y la app pinta la imagen con `mix-blend-mode: multiply`. Para zurdos se refleja. Hechas: `postura-lateral` (hoyo 4) y `putt-frente` (hoyo 6, golpe 2).
   - (0.2.3) El maniquí 3D imita al de la ilustración: cintura estrecha, cabeza de huevo en la línea de la espalda, articulaciones de bola, manos de madera, contorno fino marrón y acabado `acuarela` (un degradado por pieza con `objectBoundingBox`; las piezas largas van en `grupo` para que el troceado no se note).
   - (0.2.4) Putt y chip en 3D (`src/tres/poses.ts`: postura a partir de parámetros; `golpes.ts`: escenas). «▶ Ver el golpe» anima el triángulo de hombros, brazos y palo girándolo alrededor de la columna (`girarTriangulo`); el visor recibe un `encuadre` fijo para que la cámara no baile. Las notas que se pisan se recolocan solas (`colocarNotas`). Sustituyen a los dibujos 2D `pendulo` y `chip-postura`.
+  - (0.2.6) Filtro `ilus` en el visor (escenas `acuarela`): trazo que tiembla un poco (feTurbulence + feDisplacementMap) y manchas suaves de acuarela, con semilla fija. El chip se queda sin ilustración de Gemini: en dos intentos puso la bola adelantada y las manos por detrás.
   - Limitación conocida: la vista «como lo ves tú» del grip se lee peor por el escorzo; por eso la vista por defecto es «de frente».
 - **Todo hoyo nace con `revisadoPorProfe: false`** y la lección lo avisa. Lo técnico (grip, postura, chip…) es enseñanza estándar, pero debe validarlo el profesor de Miguel antes de darlo por bueno.
 - Datos de reglas comprobados (15/11/2026) contra The R&A, la USGA y prensa especializada; las fuentes van en cada hoyo.
@@ -106,7 +107,7 @@ bun run capturas   # PNG de cada dibujo en capturas/
 ## 8. Pendiente
 
 - Opinión de Miguel sobre las figuras 3D antes de extenderlas (chip y putt aún tienen el cuerpo en 2D).
-- Hoyos 9, 10, 11, 13 y 14 del nivel principiante (probablemente con poses 3D del swing); después intermedio y avanzado.
+- Poses 3D del swing (subida, impacto, final) para los hoyos 9–11, 13 y 14; después, intermedio y avanzado.
 - Revisión de todo el contenido técnico por el profesor.
 - Cuentas, Libreta y Caddie (fase 1).
 - Alojar las fuentes en el propio sitio.

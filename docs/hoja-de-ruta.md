@@ -1,6 +1,6 @@
 # MyGolf · Hoja de ruta
 
-*aprende-golf.com · actualizado el 15 de noviembre de 2026*
+*aprende-golf.com · actualizado el 16 de noviembre de 2026*
 
 Etiquetas: **[Decidido]** lo ha decidido Miguel · **[Propuesta]** pendiente de confirmar · **[Futuro]** apuntado para más adelante, no se construye ahora.
 
@@ -16,7 +16,8 @@ Etiquetas: **[Decidido]** lo ha decidido Miguel · **[Propuesta]** pendiente de 
 
 - [Decidido] Cuentas (Supabase Auth), una por persona.
 - [Decidido] Registro de clases: notas propias de cada clase con el profesor (fecha, qué se trabajó, sensaciones, deberes).
-- [Decidido] Curso teórico desde cero.
+- [Decidido] Curso teórico desde cero, en **tres niveles**: principiante (todo lo previo a salir al campo; las nociones del campo y los palos, al final), intermedio (el juego en el campo) y avanzado (perfeccionamiento). Se mantiene la idea de hoyos. Hecho en la 0.2.0 (principiante a medio escribir).
+- [Decidido] Figuras 3D giratorias para cuerpo y manos (opción B). Primera versión en la 0.2.0, pendiente de que Miguel la valore.
 - [Decidido] IA en esta fase («Caddie»): responder preguntas de teoría del curso y preparar un plan de práctica semanal a partir de las notas de clase.
 - [Decidido] Ajustes de usuario: correo, contraseña, clave de Claude y opciones que se irán añadiendo (por ejemplo, diestro o zurdo).
 - [Decidido] Diseño: dirección «Libreta del caddie» (yardage book). Pantallas de muestra en el lienzo de diseño «MyGolf · Libreta del caddie».

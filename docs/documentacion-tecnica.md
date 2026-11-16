@@ -37,7 +37,7 @@ Toma como referencia el stack de Naipera (`Xizo1971/Juegos_cartas`), quitando lo
 - **Supabase:** proyecto nuevo; Miguel revisa el coste antes de crearlo.
 - **Diseño:** «Libreta del caddie». Tipografías Barlow Condensed (títulos y números), Barlow (texto) y Caveat (notas a mano); papel `#F1ECDD`, tinta `#1E2B23`, calle `#2E6B3C`, bandera `#D9541E` (texto en `#B8441A`), arena `#E4D3A2`, agua `#3C7FA6`. En la libreta de clases se usan los símbolos de la tarjeta de juego: círculo = salió bien, cuadrado = me costó.
 
-## 4. Estructura del repositorio (0.1.0)
+## 4. Estructura del repositorio (0.2.0)
 
 ```
 build.ts                 Compila static/ + src/main.tsx → public/ (no se sube al repo)
@@ -47,29 +47,38 @@ server/dev.ts            Servidor local (http://localhost:8788)
 static/                  index.html, estilo.css, icono.svg, manifest.webmanifest
 src/main.tsx             Arranque y rutas por almohadilla (#/, #/hoyo/N, #/ajustes…)
 src/i18n/t.ts            tx(): textos de la interfaz (español = clave)
-src/curso/               Curso: tipos, programa de 18 hoyos y contenido/es/ (hoyos 1–9)
-src/figuras/             Dibujos SVG del curso (17), con versión para zurdos donde importa
+src/curso/               Curso: tipos, programa en 3 niveles y contenido/es/principiante.ts
+src/figuras/             Dibujos del curso (18): SVG 2D y figuras 3D (tres.tsx), con versión para zurdos
+src/tres/                Motor 3D propio sin dependencias: motor.ts, Visor3D.tsx, maniqui.ts, manos.ts
 src/ui/                  Pantallas: Recorrido, HoyoPantalla, Ajustes, Nav
-tests/                   bun test: integridad del curso y de los dibujos
-scripts/capturas.ts      Captura cada dibujo en capturas/ para revisarlo
+tests/                   bun test: curso, dibujos, motor 3D y sello de versión
+scripts/capturas.ts      Captura cada dibujo 2D en capturas/ para revisarlo
+scripts/vistas3d.tsx     Captura las vistas de las figuras 3D
 ```
 
 ## 5. El curso
 
 - **Hoyo = lección; golpe = paso; par = número de golpes.** Cada hoyo tiene objetivo, golpes (texto, dibujo, nota del caddie, ejercicio), preguntas de green con explicación y fuentes.
-- Orden «del hoyo hacia fuera»: ida (1–9) = el juego, lo común a todos los golpes y el juego corto; vuelta (10–18) = swing completo y juego en el campo. Programa en `src/curso/programa.ts`; escritos los hoyos 1–9.
+- **Tres niveles (0.2.0, a petición de Miguel):** en las clases se tarda meses en salir al campo, así que el curso empieza por la técnica.
+  - **Principiante · Campo de prácticas (15 hoyos):** todo lo necesario antes de salir al campo. Grip, postura, alineación, putt, chip, pitch, swing, impacto; los palos, el driver, el búnker y las nociones del campo van al final. Escritos: 1–8, 12 y 15. Pendientes: 9 (pitch), 10 (swing completo), 11 (impacto), 13 (driver) y 14 (búnker).
+  - **Intermedio · En el campo (9):** reglas que se usan jugando, rutina, estrategia, cuestas, rough, viento, primera vuelta, hándicap. Sin escribir.
+  - **Avanzado · Afinar (9):** efectos, altura, distancias con wedges, greens difíciles, presión, juego mental, práctica con objetivo, estadísticas. Sin escribir.
+  - Identificador de hoyo `<nivel>-<n>`; rutas `#/nivel/<nivel>` y `#/hoyo/<nivel>/<n>`. Programa en `src/curso/programa.ts`.
+- **Figuras 3D:** maniquí de madera y manos que se giran arrastrando, con vistas fijas (detrás de la línea, de frente, en diagonal, desde arriba; en el grip: de frente, como lo ves tú, desde el objetivo, desde atrás). Notas que se pueden ocultar. Para zurdos se refleja el mundo. Motor propio porque no hay dependencias 3D instaladas: esferas y cápsulas proyectadas en perspectiva, pintadas de lejos a cerca, con contorno de tinta.
+  - Ejes: +x hacia el objetivo, +y arriba, +z del jugador hacia la bola.
+  - Limitación conocida: la vista «como lo ves tú» del grip se lee peor por el escorzo; por eso la vista por defecto es «de frente».
 - **Todo hoyo nace con `revisadoPorProfe: false`** y la lección lo avisa. Lo técnico (grip, postura, chip…) es enseñanza estándar, pero debe validarlo el profesor de Miguel antes de darlo por bueno.
 - Datos de reglas comprobados (15/11/2026) contra The R&A, la USGA y prensa especializada; las fuentes van en cada hoyo.
 - La regla del 12 del chip: las fuentes coinciden en PW 1:2, 9 1:3, 7 1:5, pero **no** en los wedges más abiertos; por eso el dibujo solo usa esos tres palos.
 - Dibujos: `FIGURAS` en `src/figuras/index.ts`; `porMano: true` si cambian para zurdos (se reflejan y los textos se recolocan, no se invierten). Cada dibujo lleva `aria-label` descriptivo.
-- El progreso (hoyos terminados) y la mano se guardan en `localStorage` (`mygolf.curso`, `mygolf.mano`) hasta que haya cuentas.
+- El progreso (hoyos terminados) y la mano se guardan en `localStorage` (`mygolf.curso.v2`, `mygolf.mano`, `mygolf.nivel`) hasta que haya cuentas.
 
 ## 6. Desarrollo, pruebas y despliegue
 
 ```
 bun install
 bun run dev        # compila y sirve http://localhost:8788
-bun test           # 74 pruebas
+bun test           # 97 pruebas
 bun run typecheck  # tsc (necesita bun install: incluye @types/react)
 bun run capturas   # PNG de cada dibujo en capturas/
 ```
@@ -89,9 +98,12 @@ bun run capturas   # PNG de cada dibujo en capturas/
 - Cada compilación lleva un **sello**: versión de `package.json`, commit (7 caracteres) y fecha. En Cloudflare el commit sale de `WORKERS_CI_COMMIT_SHA`; en local, de git (con `+local` si hay cambios sin subir).
 - Se ve en **tres sitios**: al pie de todas las pantallas («MyGolf v0.1.1 · a1b2c3d · 16/11/2026 10:20», hora de Madrid), en `/version.json` y en `/api/salud`.
 - Si el sello de la app abierta no coincide con `/version.json` (navegador o app instalada con una copia vieja), la app muestra «Hay una versión más nueva… Toca para recargar».
-- **Norma:** subir la versión de `package.json` en cada entrega (0.1.1 = sello de versión; 0.2.0 = cuentas, libreta y caddie).
+- **Norma:** subir la versión de `package.json` en cada entrega (0.1.1 = sello de versión; 0.2.0 = tres niveles y figuras 3D; 0.3.0 = cuentas, libreta y caddie).
 
 ## 8. Pendiente
 
-- Revisión del diseño por Miguel.
-- Contenido de los 18 hoyos del curso (borrador: 1–9 fundamentos, 10–18 swing y juego).
+- Opinión de Miguel sobre las figuras 3D antes de extenderlas (chip y putt aún tienen el cuerpo en 2D).
+- Hoyos 9, 10, 11, 13 y 14 del nivel principiante (probablemente con poses 3D del swing); después intermedio y avanzado.
+- Revisión de todo el contenido técnico por el profesor.
+- Cuentas, Libreta y Caddie (fase 1).
+- Alojar las fuentes en el propio sitio.

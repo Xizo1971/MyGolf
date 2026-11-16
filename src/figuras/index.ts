@@ -4,8 +4,8 @@ import type { PropsFigura } from './comun';
 import { Estacas, PlanoHoyo, Tarjeta, ZonaSalida } from './campo';
 import { Bolsa, Loft } from './palos';
 import { GreenCuidados, Seguridad } from './etiqueta';
-import { GripV, TiposGrip } from './grip';
-import { PosicionBola, PosturaPerfil } from './postura';
+import { PosicionBola } from './postura';
+import { Grip3D, ManoArriba3D, Postura3D, TiposGrip3D } from './tres';
 import { ViasTren } from './alineacion';
 import { Caida, Pendulo } from './putt';
 import { ChipPostura, VueloRodado } from './chip';
@@ -25,9 +25,10 @@ export const FIGURAS = {
   loft: { componente: Loft, porMano: false },
   seguridad: { componente: Seguridad, porMano: true },
   'green-cuidados': { componente: GreenCuidados, porMano: false },
-  'grip-v': { componente: GripV, porMano: true },
-  'tipos-grip': { componente: TiposGrip, porMano: true },
-  'postura-perfil': { componente: PosturaPerfil, porMano: true },
+  'mano-arriba-3d': { componente: ManoArriba3D, porMano: true },
+  'grip-3d': { componente: Grip3D, porMano: true },
+  'tipos-grip-3d': { componente: TiposGrip3D, porMano: true },
+  'postura-3d': { componente: Postura3D, porMano: true },
   'posicion-bola': { componente: PosicionBola, porMano: true },
   'vias-tren': { componente: ViasTren, porMano: true },
   pendulo: { componente: Pendulo, porMano: true },

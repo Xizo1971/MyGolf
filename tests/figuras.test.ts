@@ -9,10 +9,11 @@ describe('dibujos', () => {
     for (const zurdo of ficha.porMano ? [false, true] : [false]) {
       test(`${id}${zurdo ? ' (zurdo)' : ''} se pinta sin números rotos y con texto alternativo`, () => {
         const svg = renderToStaticMarkup(createElement(ficha.componente, { zurdo }));
-        expect(svg.startsWith('<svg')).toBe(true);
+        // Los dibujos 3D van dentro de un visor (con botones); el dibujo es su primer <svg>.
+        expect(svg.includes('<svg')).toBe(true);
         expect(svg).not.toContain('NaN');
         expect(svg).not.toContain('undefined');
-        const etiqueta = /aria-label="([^"]+)"/.exec(svg)?.[1] ?? '';
+        const etiqueta = /<svg[^>]*aria-label="([^"]+)"/.exec(svg)?.[1] ?? '';
         expect(etiqueta.length).toBeGreaterThan(30);
       });
     }

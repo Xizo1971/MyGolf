@@ -1,7 +1,7 @@
 // Una lección («hoyo»): sus golpes uno a uno, las preguntas de green y el final.
 import { useEffect, useState } from 'react';
 import { tx } from '../i18n/t';
-import { hoyo as buscarHoyo, par, type Hoyo } from '../curso';
+import { NIVELES, hoyo as buscarHoyo, idHoyo, par, programaDe, type Nivel } from '../curso';
 import type { Pregunta } from '../curso/tipos';
 import { FIGURAS } from '../figuras';
 import { Texto } from './Texto';
@@ -62,17 +62,18 @@ function PreguntaGreen({ p, n, total, onSiguiente }: { p: Pregunta; n: number; t
   );
 }
 
-export function HoyoPantalla({ numero }: { numero: number }) {
-  const h = buscarHoyo(numero);
+export function HoyoPantalla({ nivel, numero }: { nivel: Nivel; numero: number }) {
+  const h = buscarHoyo(nivel, numero);
+  const volver = `#/nivel/${nivel}`;
   const [paso, setPaso] = useState(0);
   const [mano] = useMano();
   const { marcar } = useHoyosHechos();
-  useEffect(() => { setPaso(0); window.scrollTo(0, 0); }, [numero]);
+  useEffect(() => { setPaso(0); window.scrollTo(0, 0); }, [nivel, numero]);
   useEffect(() => { window.scrollTo(0, 0); }, [paso]);
   if (!h) {
     return (
       <div className="pantalla">
-        <main className="contenido"><p>{tx('Este hoyo aún no está escrito.')}</p><a className="boton" href="#/">{tx('Volver al recorrido')}</a><Sello /></main>
+        <main className="contenido"><p>{tx('Este hoyo aún no está escrito.')}</p><a className="boton" href={volver}>{tx('Volver al recorrido')}</a><Sello /></main>
       </div>
     );
   }
@@ -84,10 +85,10 @@ export function HoyoPantalla({ numero }: { numero: number }) {
   return (
     <div className="pantalla">
       <header className="barra-hoyo">
-        <a href="#/" className="icono" aria-label={tx('Volver al recorrido')}>
+        <a href={volver} className="icono" aria-label={tx('Volver al recorrido')}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
         </a>
-        <span className="rotulo">{h.numero <= 9 ? tx('Ida · hoyo {0} de 18', [h.numero]) : tx('Vuelta · hoyo {0} de 18', [h.numero])}</span>
+        <span className="rotulo">{tx('{0} · hoyo {1} de {2}', [tx(NIVELES.find((n) => n.id === h.nivel)!.nombre), h.numero, programaDe(h.nivel).length])}</span>
         <span className="icono" />
       </header>
 
@@ -136,7 +137,7 @@ export function HoyoPantalla({ numero }: { numero: number }) {
             n={paso - nGolpes + 1}
             total={h.preguntas.length}
             onSiguiente={() => {
-              if (paso + 1 >= nGolpes + h.preguntas.length) marcar(h.numero);
+              if (paso + 1 >= nGolpes + h.preguntas.length) marcar(idHoyo(h.nivel, h.numero));
               setPaso(paso + 1);
             }}
           />
@@ -158,8 +159,11 @@ export function HoyoPantalla({ numero }: { numero: number }) {
               </div>
             )}
             <div className="botones">
-              <a className="boton secundario" href="#/">{tx('Al recorrido')}</a>
-              {buscarHoyo(h.numero + 1) && <a className="boton" href={`#/hoyo/${h.numero + 1}`}>{tx('Hoyo {0} →', [h.numero + 1])}</a>}
+              <a className="boton secundario" href={volver}>{tx('Al recorrido')}</a>
+              {(() => {
+                const sig = programaDe(h.nivel).map((e) => buscarHoyo(h.nivel, e.numero)).find((x) => x && x.numero > h.numero);
+                return sig ? <a className="boton" href={`#/hoyo/${h.nivel}/${sig.numero}`}>{tx('Hoyo {0} →', [sig.numero])}</a> : null;
+              })()}
             </div>
           </section>
         )}

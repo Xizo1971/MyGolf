@@ -1,19 +1,46 @@
 import { describe, expect, test } from 'bun:test';
-import { HOYOS, PROGRAMA, par } from '../src/curso';
+import { HOYOS, NIVELES, PROGRAMA, idHoyo, par, programaDe } from '../src/curso';
 import { FIGURAS } from '../src/figuras';
+import { puntosRecorrido } from '../src/ui/Recorrido';
 
 describe('programa', () => {
-  test('tiene los 18 hoyos, numerados del 1 al 18, 9 de ida y 9 de vuelta', () => {
-    expect(PROGRAMA.map((e) => e.numero)).toEqual(Array.from({ length: 18 }, (_, i) => i + 1));
-    expect(PROGRAMA.filter((e) => e.tramo === 'ida').length).toBe(9);
-    expect(PROGRAMA.filter((e) => e.tramo === 'vuelta').length).toBe(9);
+  test('tres niveles: principiante 15, intermedio 9 y avanzado 9 hoyos', () => {
+    expect(NIVELES.map((n) => n.id)).toEqual(['principiante', 'intermedio', 'avanzado']);
+    expect(programaDe('principiante').length).toBe(15);
+    expect(programaDe('intermedio').length).toBe(9);
+    expect(programaDe('avanzado').length).toBe(9);
+  });
+
+  test('en cada nivel los hoyos van del 1 al último, sin huecos ni repetidos', () => {
+    for (const n of NIVELES) {
+      const nums = programaDe(n.id).map((e) => e.numero);
+      expect(nums).toEqual(Array.from({ length: nums.length }, (_, i) => i + 1));
+    }
+  });
+
+  test('el principiante empieza por la seguridad y deja el campo para el final', () => {
+    const p = programaDe('principiante');
+    expect(p[0]!.titulo).toBe('Tu primer día');
+    expect(p[p.length - 1]!.titulo).toBe('Antes de salir al campo');
+  });
+
+  test('los identificadores son únicos', () => {
+    expect(new Set(PROGRAMA.map((e) => idHoyo(e.nivel, e.numero))).size).toBe(PROGRAMA.length);
+  });
+
+  test('el mapa reparte los hoyos por el camino sin repetir posición', () => {
+    for (const n of [9, 15, 18]) {
+      const pts = puntosRecorrido(n);
+      expect(pts.length).toBe(n);
+      expect(new Set(pts.map((p) => p.join(','))).size).toBe(n);
+    }
   });
 });
 
 describe('hoyos escritos', () => {
   for (const h of HOYOS) {
-    describe(`hoyo ${h.numero}`, () => {
-      const entrada = PROGRAMA.find((e) => e.numero === h.numero)!;
+    describe(`${h.nivel} ${h.numero}`, () => {
+      const entrada = PROGRAMA.find((e) => e.nivel === h.nivel && e.numero === h.numero)!;
 
       test('coincide con el programa', () => {
         expect(entrada).toBeDefined();
@@ -34,7 +61,6 @@ describe('hoyos escritos', () => {
           expect(g.texto.length).toBeGreaterThan(0);
           for (const p of g.texto) {
             expect(p.trim().length).toBeGreaterThan(20);
-            // Las negritas tienen que ir por parejas.
             expect((p.match(/\*\*/g) ?? []).length % 2).toBe(0);
           }
           if (g.figura) expect(FIGURAS[g.figura.id]).toBeDefined();
@@ -58,8 +84,8 @@ describe('hoyos escritos', () => {
     });
   }
 
-  test('no hay dos hoyos con el mismo número', () => {
-    expect(new Set(HOYOS.map((h) => h.numero)).size).toBe(HOYOS.length);
+  test('no hay dos hoyos con el mismo identificador', () => {
+    expect(new Set(HOYOS.map((h) => idHoyo(h.nivel, h.numero))).size).toBe(HOYOS.length);
   });
 
   test('todos los dibujos del catálogo se usan en algún hoyo', () => {

@@ -138,3 +138,24 @@ button { font: inherit; }
 /* Sello de versión: discreto, al final de cada pantalla */
 .sello { margin-top: 28px; padding-top: 10px; border-top: 1px dotted var(--borde); text-align: center; font-family: var(--f-rotulo); font-size: 12px; letter-spacing: .06em; color: #6E7569; }
 .sello-aviso { display: block; width: 100%; margin-bottom: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--bandera-texto); background: var(--papel-claro); color: var(--bandera-texto); font-family: var(--f-texto); font-size: 14px; cursor: pointer; }
+
+/* Niveles: tres recorridos */
+.niveles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 2px solid var(--tinta); margin-top: 4px; }
+.niveles a { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 56px; padding: 6px 4px; text-decoration: none; color: var(--tinta); text-align: center; }
+.niveles a + a { border-left: 1px solid var(--tinta); }
+.niveles a.on { background: var(--tinta); color: var(--papel); }
+.niv-etq { font-family: var(--f-rotulo); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
+.niv-nombre { font-family: var(--f-rotulo); font-weight: 700; font-size: 17px; line-height: 1.1; }
+.niv-desc { margin: 8px 0 12px; color: var(--gris); font-size: 15px; }
+
+/* Visor 3D */
+.visor3d svg:active { cursor: grabbing; }
+.visor3d-botones { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.visor3d-botones button { min-height: 40px; padding: 0 12px; border: 1.5px solid var(--tinta); background: var(--papel-claro); color: var(--tinta); font-family: var(--f-rotulo); font-weight: 600; font-size: 15px; cursor: pointer; }
+.visor3d-botones button.on { background: var(--tinta); color: var(--papel); }
+.visor3d-botones button.guias { border-style: dashed; color: var(--gris); margin-left: auto; }
+.selector-union { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 2px solid var(--tinta); margin-bottom: 8px; }
+.selector-union button { min-height: 44px; border: 0; background: transparent; color: var(--tinta); font-family: var(--f-rotulo); font-weight: 700; font-size: 16px; cursor: pointer; }
+.selector-union button + button { border-left: 1px solid var(--tinta); }
+.selector-union button.on { background: var(--tinta); color: var(--papel); }
+.nota-union { font-size: 15px !important; color: var(--gris); margin: 8px 0 0 !important; }

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 
 const CLAVE_MANO = 'mygolf.mano';
-const CLAVE_CURSO = 'mygolf.curso';
+const CLAVE_CURSO = 'mygolf.curso.v2';
+const CLAVE_NIVEL = 'mygolf.nivel';
 const EVENTO = 'mygolf-preferencias';
 
 function leer<T>(clave: string, porDefecto: T): T {
@@ -44,11 +45,16 @@ export function useMano() {
   return usePreferencia<Mano>(CLAVE_MANO, 'diestro');
 }
 
-/** Hoyos terminados (números). */
+/** Hoyos terminados, por identificador («principiante-3»). */
 export function useHoyosHechos() {
-  const [hechos, poner] = usePreferencia<number[]>(CLAVE_CURSO, []);
-  const marcar = (n: number) => {
-    if (!hechos.includes(n)) poner([...hechos, n].sort((a, b) => a - b));
+  const [hechos, poner] = usePreferencia<string[]>(CLAVE_CURSO, []);
+  const marcar = (id: string) => {
+    if (!hechos.includes(id)) poner([...hechos, id]);
   };
   return { hechos, marcar };
+}
+
+/** Nivel que se ve en el recorrido. */
+export function useNivelVisto() {
+  return usePreferencia<string>(CLAVE_NIVEL, 'principiante');
 }

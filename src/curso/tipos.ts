@@ -1,10 +1,13 @@
-// Modelo del curso. Un «hoyo» es una lección; cada «golpe» es un paso de la lección.
-// El par del hoyo es el número de golpes. El texto de las lecciones está en español
-// (contenido/es); cuando haya otros idiomas, cada idioma tendrá su carpeta.
+// Modelo del curso. Tres niveles; cada nivel es un recorrido de hoyos.
+// Un «hoyo» es una lección; cada «golpe» es un paso de la lección; el par es el número
+// de golpes. El texto de las lecciones está en español (contenido/es); cuando haya otros
+// idiomas, cada idioma tendrá su carpeta.
 
 import type { FiguraId } from '../figuras';
 
-/** Párrafo con negritas marcadas como **así**. */
+export type Nivel = 'principiante' | 'intermedio' | 'avanzado';
+
+/** Párrafo con negritas marcadas como **así** y cursivas como *así*. */
 export type Parrafo = string;
 
 export interface Golpe {
@@ -32,6 +35,7 @@ export interface Fuente {
 }
 
 export interface Hoyo {
+  nivel: Nivel;
   numero: number;
   titulo: string;
   /** Una frase: qué sabrás hacer al terminar. */
@@ -41,15 +45,29 @@ export interface Hoyo {
   preguntas: Pregunta[];
   /** Fuentes de los datos de reglas o de hechos comprobables. */
   fuentes: Fuente[];
-  /** Pendiente de que lo revise el profesor (se enseña en la lección). */
+  /** Pendiente de que lo revise el profesor (se avisa en la lección). */
   revisadoPorProfe: boolean;
 }
 
 /** Entrada del programa: lo que se sabe de cada hoyo aunque aún no esté escrito. */
 export interface EntradaPrograma {
+  nivel: Nivel;
   numero: number;
   titulo: string;
-  tramo: 'ida' | 'vuelta';
   objetivo: string;
   puntos: string[];
+}
+
+export interface FichaNivel {
+  id: Nivel;
+  /** Nombre del recorrido, en el lenguaje de la libreta. */
+  nombre: string;
+  /** Nivel en palabras llanas. */
+  etiqueta: string;
+  descripcion: string;
+}
+
+/** Identificador estable de un hoyo: «principiante-3». */
+export function idHoyo(nivel: Nivel, numero: number): string {
+  return `${nivel}-${numero}`;
 }

@@ -1,16 +1,23 @@
-// Punto de entrada del curso: programa completo + hoyos ya escritos.
-import { PROGRAMA } from './programa';
-import type { EntradaPrograma, Hoyo } from './tipos';
-import { HOYO_1, HOYO_2, HOYO_3, HOYO_4 } from './contenido/es/ida-juego';
-import { HOYO_5, HOYO_6, HOYO_7, HOYO_8, HOYO_9 } from './contenido/es/ida-tecnica';
+// Punto de entrada del curso: niveles, programa completo y hoyos ya escritos.
+import { NIVELES, PROGRAMA, programaDe } from './programa';
+import { idHoyo, type EntradaPrograma, type FichaNivel, type Hoyo, type Nivel } from './tipos';
+import { PRINCIPIANTE } from './contenido/es/principiante';
 
-export { PROGRAMA };
-export type { EntradaPrograma, Hoyo };
+export { NIVELES, PROGRAMA, programaDe, idHoyo };
+export type { EntradaPrograma, FichaNivel, Hoyo, Nivel };
 
-export const HOYOS: Hoyo[] = [HOYO_1, HOYO_2, HOYO_3, HOYO_4, HOYO_5, HOYO_6, HOYO_7, HOYO_8, HOYO_9];
+export const HOYOS: Hoyo[] = [...PRINCIPIANTE];
 
-export function hoyo(numero: number): Hoyo | undefined {
-  return HOYOS.find((h) => h.numero === numero);
+export function hoyo(nivel: Nivel, numero: number): Hoyo | undefined {
+  return HOYOS.find((h) => h.nivel === nivel && h.numero === numero);
+}
+
+export function hoyosDe(nivel: Nivel): Hoyo[] {
+  return HOYOS.filter((h) => h.nivel === nivel);
+}
+
+export function esNivel(x: string): x is Nivel {
+  return NIVELES.some((n) => n.id === x);
 }
 
 /** Par de un hoyo escrito: su número de golpes. */

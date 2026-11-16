@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Visor3D, type Vista } from '../tres/Visor3D';
 import { escenaPostura } from '../tres/maniqui';
-import { GIRO_CHIP, GIRO_PUTT, escenaChip, escenaPutt } from '../tres/golpes';
+import { GIRO_CHIP, GIRO_PUTT, encuadreSwing, escenaChip, escenaPutt, escenaSwing, momentos, type TipoSwing } from '../tres/golpes';
 import { envolvente, type Escena } from '../tres/motor';
 import { escenaGrip, type TipoUnion } from '../tres/manos';
 import type { PropsFigura } from './comun';
@@ -147,4 +147,63 @@ export function Chip3D({ zurdo }: PropsFigura) {
       etiqueta={`Maniquí en la postura del chip visto de frente: pies juntos, la bola algo retrasada, más peso en el pie ${zurdo ? 'derecho' : 'izquierdo'} y las manos por delante de la bola, con el palo inclinado hacia el objetivo. Se puede girar y animar.`}
     />
   );
+}
+
+// --- El swing: momentos clave y animación --------------------------------------------
+
+/**
+ * Swing en 3D: botones para pararlo en cada momento (con sus notas) y «▶ Ver el golpe»
+ * para verlo entero (sin notas, que se moverían). Empieza en `inicial`.
+ */
+function Swing3D({ zurdo, tipo, inicial, etiqueta }: PropsFigura & { tipo: TipoSwing; inicial: number; etiqueta: string }) {
+  const ms = useMemo(() => momentos(tipo), [tipo]);
+  const encuadre = useMemo(() => encuadreSwing(tipo), [tipo]);
+  const total = ms[ms.length - 1]!.t + 0.9;
+  const [momento, setMomento] = useState(inicial);
+  const [t, setT] = useState<number | null>(null);
+  useEffect(() => {
+    if (t === null) return;
+    let id = 0;
+    const t0 = performance.now();
+    const paso = (ahora: number) => {
+      setT((((ahora - t0) / 1000) % total));
+      id = requestAnimationFrame(paso);
+    };
+    id = requestAnimationFrame(paso);
+    return () => cancelAnimationFrame(id);
+    // Solo arranca o para; t cambia en cada fotograma.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t === null, total]);
+  const jugando = t !== null;
+  const escena = useMemo(
+    () => (jugando ? escenaSwing(tipo, t!) : escenaSwing(tipo, ms[momento]!.t, ms[momento]!.notas)),
+    [jugando, t, tipo, ms, momento],
+  );
+  const botones = (
+    <>
+      {ms.map((m, i) => (
+        <button key={m.nombre} type="button" className={!jugando && i === momento ? 'on' : undefined} aria-pressed={!jugando && i === momento}
+          onClick={() => { setT(null); setMomento(i); }}>{m.nombre}</button>
+      ))}
+      <button type="button" className={jugando ? 'on' : undefined} aria-pressed={jugando} onClick={() => setT(jugando ? null : 0)}>
+        {jugando ? '■ Parar' : '▶ Ver el golpe'}
+      </button>
+    </>
+  );
+  return <Visor3D escena={escena} encuadre={encuadre} botones={botones} vistas={VISTAS_FRENTE} zurdo={zurdo} alto={420} etiqueta={etiqueta} />;
+}
+
+export function MedioSwing3D({ zurdo }: PropsFigura) {
+  return <Swing3D zurdo={zurdo} tipo="pitch" inicial={1}
+    etiqueta="Maniquí haciendo un medio swing visto de frente: sube hasta que el brazo de arriba queda horizontal (las 9 del reloj), golpea y termina con el otro brazo horizontal (las 3). Se puede girar, parar en cada momento y animar." />;
+}
+
+export function SwingCompleto3D({ zurdo }: PropsFigura) {
+  return <Swing3D zurdo={zurdo} tipo="completo" inicial={1}
+    etiqueta="Maniquí haciendo un swing completo: en la subida la espalda queda mirando al objetivo; en el impacto golpea la bola primero; en el final queda de cara al objetivo, con el peso en el pie adelantado y el de atrás de puntillas. Se puede girar, parar en cada momento y animar." />;
+}
+
+export function Impacto3D({ zurdo }: PropsFigura) {
+  return <Swing3D zurdo={zurdo} tipo="impacto" inicial={2}
+    etiqueta="Maniquí en el momento del impacto con un hierro: las manos van por delante de la cabeza del palo, el peso está en el pie adelantado y el punto más bajo del swing (la chuleta) queda después de la bola. Se puede girar, parar en cada momento y animar." />;
 }

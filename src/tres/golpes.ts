@@ -1,7 +1,7 @@
-// Escenas 3D del juego corto: el putt y el chip, con su giro de hombros para animarlos.
-import { v, type Escena, type Linea3D, type V3 } from './motor';
-import { cuerpo, suelo } from './maniqui';
-import { POSE_CHIP, POSE_PUTT, centroPecho, construirPose, girarTriangulo, rotar } from './poses';
+// Escenas 3D: el putt, el chip y el swing (completo, medio swing e impacto), con su animación.
+import { envolvente, v, type Escena, type Etiqueta3D, type Linea3D, type V3 } from './motor';
+import { cuerpo, posturaHierro, suelo } from './maniqui';
+import { POSE_CHIP, POSE_PUTT, QUIETO, centroPecho, construirPose, faseEn, girarTriangulo, poseSwing, rotar, type FaseSwing } from './poses';
 
 const BANDERA = '#D9541E';
 const GRIS = '#5B6458';
@@ -83,4 +83,81 @@ export function escenaChip(giro = 0): Escena {
       { p: [0.95, 0, base.bola[2]], texto: ['objetivo'], dx: 4, dy: -10, color: GRIS },
     ],
   };
+}
+
+// --- El swing (hoyos 9, 10 y 11) ------------------------------------------------
+
+
+export type TipoSwing = 'completo' | 'pitch' | 'impacto';
+
+export interface MomentoSwing {
+  nombre: string;
+  t: number;
+  fase: FaseSwing;
+  notas: Etiqueta3D[];
+}
+
+const ARRIBA: FaseSwing = { giro: 100, levantar: 70, bisagra: 120, rodar: 75, caderas: 42, desplazar: -0.02, erguir: 0, piernas: 0 };
+const IMPACTO: FaseSwing = { giro: -4, levantar: 0, bisagra: -4, caderas: -35, desplazar: 0.02, erguir: 0, piernas: 0.25 };
+const FINAL: FaseSwing = { giro: -110, levantar: 115, bisagra: 115, caderas: -85, desplazar: 0.07, erguir: 28, piernas: 1 };
+// El medio swing: brazo de arriba horizontal (las 9) y, después del golpe, el otro brazo horizontal (las 3).
+const LAS9: FaseSwing = { giro: 75, levantar: 40, bisagra: 80, rodar: 75, caderas: 22, desplazar: 0, erguir: 0, piernas: 0 };
+const LAS3: FaseSwing = { giro: -65, levantar: 30, bisagra: 100, caderas: -40, desplazar: 0.04, erguir: 6, piernas: 0.35 };
+
+/** Los momentos de cada swing (t en segundos) y sus notas. */
+export function momentos(tipo: TipoSwing): MomentoSwing[] {
+  const j0 = posturaHierro();
+  const sueloDelante = (dx: number): V3 => [j0.bola[0] + dx, 0, j0.bola[2]];
+  if (tipo === 'pitch') {
+    return [
+      { nombre: 'Postura', t: 0, fase: QUIETO, notas: [] },
+      { nombre: 'Las 9', t: 0.8, fase: LAS9, notas: [{ p: poseSwing(j0, LAS9).manoI, texto: ['brazo horizontal:', 'las 9'], dx: -10, dy: 40, ancla: 'end' }] },
+      { nombre: 'Impacto', t: 1.15, fase: IMPACTO, notas: [] },
+      { nombre: 'Las 3', t: 1.55, fase: LAS3, notas: [{ p: poseSwing(j0, LAS3).manoD, texto: ['el otro brazo', 'horizontal: las 3'], dx: 16, dy: -20 }] },
+    ];
+  }
+  const impacto: Etiqueta3D[] = tipo === 'impacto'
+    ? [
+        { p: v.entre(poseSwing(j0, IMPACTO).manoI, poseSwing(j0, IMPACTO).manoD, 0.5), texto: ['manos por delante', 'de la cabeza', 'del palo'], dx: -40, dy: -6, ancla: 'end', color: TINTA },
+        { p: sueloDelante(0.07), texto: ['el punto más bajo,', 'después de la bola'], dx: 10, dy: 30 },
+        { p: v.sum(poseSwing(j0, IMPACTO).caderaI, [0.08, -0.3, 0]), texto: ['peso en el', 'pie adelantado'], dx: 22, dy: 0, color: TINTA },
+      ]
+    : [{ p: v.entre(poseSwing(j0, IMPACTO).manoI, poseSwing(j0, IMPACTO).manoD, 0.5), texto: ['bola primero,', 'después el suelo'], dx: 18, dy: -10, color: TINTA }];
+  return [
+    { nombre: 'Postura', t: 0, fase: QUIETO, notas: [] },
+    { nombre: 'Arriba', t: 1.1, fase: ARRIBA, notas: [{ p: poseSwing(j0, ARRIBA).cuello, texto: ['la espalda', 'mira al objetivo'], dx: -40, dy: 40, ancla: 'end' }] },
+    { nombre: 'Impacto', t: 1.45, fase: IMPACTO, notas: impacto },
+    { nombre: 'Final', t: 1.85, fase: FINAL, notas: [
+      { p: poseSwing(j0, FINAL).cuello, texto: ['de cara', 'al objetivo'], dx: 30, dy: 10 },
+      { p: poseSwing(j0, FINAL).talonD, texto: ['de puntillas', 'con el pie de atrás'], dx: -20, dy: 14, ancla: 'end', color: TINTA },
+    ] },
+  ];
+}
+
+/** Escena del swing en el instante `t` (s). Las notas solo se ven en los momentos clave. */
+export function escenaSwing(tipo: TipoSwing, t: number, notas: Etiqueta3D[] = []): Escena {
+  const j0 = posturaHierro();
+  const marcas = momentos(tipo).map((m) => [m.t, m.fase] as [number, FaseSwing]);
+  const j = poseSwing(j0, faseEn(marcas, t));
+  const guias: Linea3D[] = [];
+  if (tipo === 'impacto') {
+    // la chuleta: empieza justo después de la bola
+    guias.push({ a: [j0.bola[0] + 0.03, 0.002, j0.bola[2]], b: [j0.bola[0] + 0.15, 0.002, j0.bola[2]], color: '#8A6A3E', ancho: 6 });
+  }
+  return {
+    prims: cuerpo(j),
+    fondo: suelo(j0),
+    acuarela: true,
+    contorno: CONTORNO,
+    guias,
+    etiquetas: notas,
+    etiquetasHastaPitch: 60,
+  };
+}
+
+/** Encuadre que abarca todo el swing (para que la cámara no baile ni se corte el palo). */
+export function encuadreSwing(tipo: TipoSwing) {
+  const prims = momentos(tipo).flatMap((m) => escenaSwing(tipo, m.t).prims);
+  const e = envolvente(prims);
+  return { c: e.c, r: e.r * 1.02 };
 }

@@ -574,6 +574,7 @@ export const P9: Hoyo = {
         'En el medio swing, el tronco gira y lleva los brazos hasta las **9** (el brazo de arriba, más o menos horizontal) y, después del golpe, hasta las **3**. Lo mismo de largo hacia atrás que hacia delante.',
         'La distancia se controla con **el largo del swing**, no con la fuerza: de 8 a 4 sale más corta; de 10 a 2, más larga. El ritmo es siempre el mismo.',
       ],
+      figura: { id: 'medio-swing-3d', pie: 'Toca «Las 9», «Impacto» y «Las 3», o «▶ Ver el golpe» para verlo entero.' },
     },
     {
       titulo: 'La bisagra de las muñecas',
@@ -643,6 +644,7 @@ export const P10: Hoyo = {
         'El palo queda por encima del hombro adelantado y tú, **en equilibrio**. Si te caes hacia atrás o tienes que dar un paso, algo ha ido mal antes.',
         'Comprobación sencilla: **aguanta el final tres segundos** sin moverte.',
       ],
+      figura: { id: 'swing-3d', pie: 'Para el swing en cada momento con los botones, o mira el golpe entero con «▶ Ver el golpe».' },
       ejercicio: 'Sin palo, con los brazos cruzados sobre el pecho y en postura: gira hasta que la espalda mire al objetivo, pasa el peso al pie adelantado y gira hasta que el pecho mire al objetivo. Repite despacio diez veces.',
     },
   ],
@@ -704,6 +706,7 @@ export const P11: Hoyo = {
         'Para que eso pase, **el peso tiene que estar en el pie adelantado** al llegar a la bola. Si se queda atrás, el palo adelanta a las manos y el punto más bajo se va detrás de la bola.',
         'Con el driver es distinto: va sobre un tee y se golpea un poco hacia arriba. Lo verás en el hoyo 13.',
       ],
+      figura: { id: 'impacto-3d', pie: 'La franja marrón es la chuleta: empieza después de la bola.' },
       ejercicio: 'En el campo de prácticas, pinta una línea en el suelo (o pon una toalla fina) y coloca la bola encima. Haz medios swings: la chuleta tiene que empezar en la línea o después, nunca antes.',
     },
   ],

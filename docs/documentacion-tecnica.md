@@ -70,6 +70,7 @@ scripts/vistas3d.tsx     Captura las vistas de las figuras 3D
   - (0.2.3) El maniquí 3D imita al de la ilustración: cintura estrecha, cabeza de huevo en la línea de la espalda, articulaciones de bola, manos de madera, contorno fino marrón y acabado `acuarela` (un degradado por pieza con `objectBoundingBox`; las piezas largas van en `grupo` para que el troceado no se note).
   - (0.2.4) Putt y chip en 3D (`src/tres/poses.ts`: postura a partir de parámetros; `golpes.ts`: escenas). «▶ Ver el golpe» anima el triángulo de hombros, brazos y palo girándolo alrededor de la columna (`girarTriangulo`); el visor recibe un `encuadre` fijo para que la cámara no baile. Las notas que se pisan se recolocan solas (`colocarNotas`). Sustituyen a los dibujos 2D `pendulo` y `chip-postura`.
   - (0.2.6) Filtro `ilus` en el visor (escenas `acuarela`): trazo que tiembla un poco (feTurbulence + feDisplacementMap) y manchas suaves de acuarela, con semilla fija. El chip se queda sin ilustración de Gemini: en dos intentos puso la bola adelantada y las manos por detrás.
+  - (0.2.7) El swing en 3D (`poseSwing` en poses.ts): la postura se mueve con mandos (giro de hombros alrededor de la columna, brazos que suben sobre la línea de hombros, bisagra y rodado de muñecas, caderas, desplazamiento, enderezar la espalda y piernas del final). Los momentos clave (`momentos` en golpes.ts) se ajustaron buscando parámetros con objetivos medibles: arriba, palo paralelo a la línea del objetivo; a las 9, brazo horizontal y palo vertical. Figuras `medio-swing-3d` (hoyo 9), `swing-3d` (hoyo 10) e `impacto-3d` (hoyo 11): botones para parar en cada momento con sus notas y «▶ Ver el golpe».
   - Limitación conocida: la vista «como lo ves tú» del grip se lee peor por el escorzo; por eso la vista por defecto es «de frente».
 - **Todo hoyo nace con `revisadoPorProfe: false`** y la lección lo avisa. Lo técnico (grip, postura, chip…) es enseñanza estándar, pero debe validarlo el profesor de Miguel antes de darlo por bueno.
 - Datos de reglas comprobados (15/11/2026) contra The R&A, la USGA y prensa especializada; las fuentes van en cada hoyo.
@@ -107,7 +108,8 @@ bun run capturas   # PNG de cada dibujo en capturas/
 ## 8. Pendiente
 
 - Opinión de Miguel sobre las figuras 3D antes de extenderlas (chip y putt aún tienen el cuerpo en 2D).
-- Poses 3D del swing (subida, impacto, final) para los hoyos 9–11, 13 y 14; después, intermedio y avanzado.
+- Figuras 3D del driver (hoyo 13) y del búnker (hoyo 14); después, intermedio y avanzado.
+- Limitación del swing 3D: los codos no se doblan (en el final los brazos quedan algo estirados).
 - Revisión de todo el contenido técnico por el profesor.
 - Cuentas, Libreta y Caddie (fase 1).
 - Alojar las fuentes en el propio sitio.

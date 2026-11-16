@@ -128,3 +128,116 @@ export const POSE_CHIP: ParamsPose = {
   bola: [-0.03, 0.0213, 0.47],
   palo: 'hierro',
 };
+
+// --- El swing: la postura se mueve con unos pocos «mandos» --------------------------
+
+/**
+ * Mandos del swing, en grados (salvo los que se indican). Positivo = hacia atrás
+ * (lejos del objetivo); negativo = hacia el objetivo.
+ */
+export interface FaseSwing {
+  /** Giro de hombros alrededor de la columna. */
+  giro: number;
+  /** Los brazos suben respecto al pecho (giran sobre la línea de los hombros). */
+  levantar: number;
+  /** Bisagra de las muñecas: el palo se acerca al antebrazo. */
+  bisagra: number;
+  /** Los antebrazos ruedan: el palo gira alrededor del brazo adelantado (opcional). */
+  rodar?: number;
+  /** Giro de las caderas alrededor de la vertical. */
+  caderas: number;
+  /** Desplazamiento de la pelvis y del tronco hacia el objetivo (m). */
+  desplazar: number;
+  /** La espalda se endereza (al final del swing). */
+  erguir: number;
+  /** 0 = piernas de la postura; 1 = piernas del final (pie de atrás de puntillas). */
+  piernas: number;
+}
+
+export const QUIETO: FaseSwing = { giro: 0, levantar: 0, bisagra: 0, caderas: 0, desplazar: 0, erguir: 0, piernas: 0 };
+
+const ARRIBA_Y: V3 = [0, 1, 0];
+
+function cruz(a: V3, b: V3): V3 {
+  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+}
+
+export function poseSwing(base: Articulaciones, f: FaseSwing): Articulaciones {
+  let j = { ...base };
+  // 1. Bisagra: el palo (y la mano de abajo, que va en él) gira alrededor de la mano de arriba,
+  //    en el plano del brazo adelantado y el palo.
+  if (f.bisagra) {
+    const brazo = v.norm(v.res(j.manoI, j.hombroI));
+    const palo = v.norm(v.res(j.talonPalo, j.puno));
+    const eje = v.norm(cruz(brazo, palo));
+    const r = (q: V3) => rotar(q, j.manoI, eje, f.bisagra);
+    j = { ...j, manoD: r(j.manoD), puno: r(j.puno), talonPalo: r(j.talonPalo), puntaPalo: r(j.puntaPalo) };
+  }
+  // 1b. Rodar los antebrazos: el palo gira alrededor del brazo adelantado.
+  if (f.rodar) {
+    const eje = v.norm(v.res(j.manoI, j.hombroI));
+    const r = (q: V3) => rotar(q, j.manoI, eje, f.rodar!);
+    j = { ...j, manoD: r(j.manoD), puno: r(j.puno), talonPalo: r(j.talonPalo), puntaPalo: r(j.puntaPalo) };
+  }
+  // 2. Los brazos suben por delante del pecho: giro sobre la línea de los hombros.
+  if (f.levantar) {
+    const eje = v.norm(v.res(j.hombroI, j.hombroD));
+    const c = v.entre(j.hombroI, j.hombroD, 0.5);
+    const r = (q: V3) => rotar(q, c, eje, -f.levantar);
+    j = { ...j, codoI: r(j.codoI), codoD: r(j.codoD), manoI: r(j.manoI), manoD: r(j.manoD), puno: r(j.puno), talonPalo: r(j.talonPalo), puntaPalo: r(j.puntaPalo) };
+  }
+  // 3. Giro de hombros alrededor de la columna (con brazos y palo).
+  j = girarTriangulo(j, f.giro);
+  // 4. Caderas: giran alrededor de la vertical que pasa por la pelvis.
+  if (f.caderas) {
+    const r = (q: V3) => rotar(q, j.pelvis, ARRIBA_Y, -f.caderas);
+    j = { ...j, caderaI: r(j.caderaI), caderaD: r(j.caderaD) };
+  }
+  // 5. Enderezar la espalda: todo lo que va por encima de la pelvis gira sobre el eje x.
+  const arriba: (keyof Articulaciones)[] = ['medio', 'cuello', 'cabeza', 'hombroI', 'hombroD', 'codoI', 'codoD', 'manoI', 'manoD', 'puno', 'talonPalo', 'puntaPalo'];
+  if (f.erguir) {
+    const r = (q: V3) => rotar(q, j.pelvis, [1, 0, 0], -f.erguir);
+    const k = { ...j };
+    for (const n of arriba) k[n] = r(j[n]);
+    j = k;
+  }
+  // 6. Desplazamiento hacia el objetivo (pelvis, caderas y tronco).
+  if (f.desplazar) {
+    const d: V3 = [f.desplazar, 0, 0];
+    const k = { ...j, pelvis: v.sum(j.pelvis, d), caderaI: v.sum(j.caderaI, d), caderaD: v.sum(j.caderaD, d) };
+    for (const n of arriba) k[n] = v.sum(j[n], d);
+    j = k;
+  }
+  // 7. Piernas del final: la de delante se estira y la de atrás gira sobre la punta del pie.
+  if (f.piernas) {
+    const w = f.piernas;
+    const mover = (q: V3, d: V3): V3 => v.sum(q, v.mul(d, w));
+    j = {
+      ...j,
+      rodillaI: mover(j.rodillaI, [0.02, 0.02, -0.07]),
+      rodillaD: mover(j.rodillaD, [0.2, 0.0, 0.02]),
+      tobilloD: mover(j.tobilloD, [0.06, 0.07, 0.1]),
+      talonD: mover(j.talonD, [0.08, 0.14, 0.17]),
+    };
+  }
+  return j;
+}
+
+/** Interpola entre fases (suavizado coseno). `marcas`: [tiempo, fase] ordenadas por tiempo. */
+export function faseEn(marcas: [number, FaseSwing][], t: number): FaseSwing {
+  if (t <= marcas[0]![0]) return marcas[0]![1];
+  for (let i = 1; i < marcas.length; i++) {
+    const [t1, f1] = marcas[i]!;
+    if (t <= t1) {
+      const [t0, f0] = marcas[i - 1]!;
+      const u = (1 - Math.cos(((t - t0) / (t1 - t0)) * Math.PI)) / 2;
+      const m = (a: number, b: number) => a + (b - a) * u;
+      return {
+        giro: m(f0.giro, f1.giro), levantar: m(f0.levantar, f1.levantar), bisagra: m(f0.bisagra, f1.bisagra),
+        caderas: m(f0.caderas, f1.caderas), desplazar: m(f0.desplazar, f1.desplazar), erguir: m(f0.erguir, f1.erguir),
+        piernas: m(f0.piernas, f1.piernas), rodar: m(f0.rodar ?? 0, f1.rodar ?? 0),
+      };
+    }
+  }
+  return marcas[marcas.length - 1]![1];
+}

@@ -171,7 +171,7 @@ export const P4: Hoyo = {
         'Flexiona un poco las **rodillas**, lo justo para sentirte ágil. Los **brazos cuelgan** relajados desde los hombros, casi en vertical.',
         'Una referencia: visto desde detrás, tus **hombros quedan sobre la punta de los pies**.',
       ],
-      figura: { id: 'postura-3d', pie: 'Gira el maniquí: desde detrás de la línea se ve la inclinación; de frente, la anchura de los pies.' },
+      figura: { id: 'postura-lateral', pie: 'Desde detrás de la línea se ve la inclinación. Con «Girar en 3D» puedes verlo de frente y desde otros ángulos.' },
     },
     {
       titulo: 'El peso, en el centro',
